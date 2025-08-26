@@ -1,0 +1,146 @@
+<!--SN: Derived from k4_N4_90nm, but with a more realistic pin distribution-->
+<architecture>
+  <models>
+  </models>
+  <tiles>
+    <tile name="io">
+      <sub_tile name="io" capacity="3">
+        <equivalent_sites>
+          <site pb_type="io" pin_mapping="direct"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <clock name="clock" num_pins="1"/>
+        <fc in_type="frac" in_val="1.0" out_type="frac" out_val="0.25"/>
+        <pinlocations pattern="custom">
+          <loc side="left">io.outpad io.inpad io.clock</loc>
+          <loc side="top">io.outpad io.inpad io.clock</loc>
+          <loc side="right">io.outpad io.inpad io.clock</loc>
+          <loc side="bottom">io.outpad io.inpad io.clock</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="clb">
+      <sub_tile name="clb">
+        <equivalent_sites>
+          <site pb_type="clb" pin_mapping="direct"/>
+        </equivalent_sites>
+        <input name="I" num_pins="10" equivalent="full"/>
+        <output name="O" num_pins="4" equivalent="full"/>
+        <clock name="clk" num_pins="1"/>
+        <fc in_type="abs" in_val="4" out_type="abs" out_val="6"/>
+        <pinlocations pattern="custom">
+          <loc side="top">clb.I clb.O clb.clk</loc>
+          <loc side="right">clb.I clb.O clb.clk</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+  </tiles>
+
+  <layout>
+    <auto_layout aspect_ratio="1.000000">
+      <perimeter type="io" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+    </auto_layout>
+  </layout>
+  <device>
+    <sizing R_minW_nmos="4220.930176" R_minW_pmos="11207.599609"/>
+    <area grid_logic_tile_area="2229.320068"/>
+    <chan_width_distr>
+      <x distr="uniform" peak="1.000000"/>
+      <y distr="uniform" peak="1.000000"/>
+    </chan_width_distr>
+    <switch_block type="wilton" fs="3"/>
+    <connection_block input_switch_name="ipin_cblock"/>
+  </device>
+  <switchlist>
+    <switch type="mux" name="0" R="0" Cin="0.0" Cout="0.0" Tdel="6.244000e-11" mux_trans_size="1.835460" buf_size="10.498600"/>
+    <!--switch ipin_cblock resistance set to yeild for 4x minimum drive strength buffer-->
+   <switch type="mux" name="ipin_cblock" R="" Cout="0.0" Cin="0.0" Tdel="8.045000e-11" mux_trans_size="0.983352" buf_size="auto"/>
+  </switchlist>
+  <segmentlist>
+    <segment freq="1.0" length="1" type="unidir" Rmetal="0.0" Cmetal="0.0">
+      <mux name="0"/>
+      <sb type="pattern">1 1</sb>
+      <cb type="pattern">1</cb>
+    </segment>
+  </segmentlist>
+  <complexblocklist>
+    <pb_type name="io">
+      <input name="outpad" num_pins="1"/>
+      <output name="inpad" num_pins="1"/>
+      <clock name="clock" num_pins="1"/>
+      <mode name="inpad">
+        <pb_type name="inpad" blif_model=".input" num_pb="1">
+          <output name="inpad" num_pins="1"/>
+        </pb_type>
+        <interconnect>
+          <direct name="inpad" input="inpad.inpad" output="io.inpad">
+            <delay_constant max="9.492000e-11" in_port="inpad.inpad" out_port="io.inpad"/>
+          </direct>
+        </interconnect>
+      </mode>
+      <mode name="outpad">
+        <pb_type name="outpad" blif_model=".output" num_pb="1">
+          <input name="outpad" num_pins="1"/>
+        </pb_type>
+        <interconnect>
+          <direct name="outpad" input="io.outpad" output="outpad.outpad">
+            <delay_constant max="2.675000e-11" in_port="io.outpad" out_port="outpad.outpad"/>
+          </direct>
+        </interconnect>
+      </mode>
+      <power method="ignore"/>
+    </pb_type>
+
+    <pb_type name="clb">
+      <input name="I" num_pins="10" equivalent="full"/>
+      <output name="O" num_pins="4" equivalent="full"/>
+      <clock name="clk" num_pins="1"/>
+        <pb_type name="ble4" num_pb="4">
+          <input name="in" num_pins="4"/>
+          <output name="out" num_pins="1"/>
+          <clock name="clk" num_pins="1"/>
+          <!-- Define LUT -->
+          <pb_type name="lut4" blif_model=".names" num_pb="1" class="lut">
+            <input name="in" num_pins="4" port_class="lut_in"/>
+            <output name="out" num_pins="1" port_class="lut_out"/>
+            <!-- LUT timing using delay matrix -->
+            <delay_matrix type="max" in_port="lut4.in" out_port="lut4.out">
+              2.253000e-10
+              2.253000e-10
+              2.253000e-10
+              2.253000e-10
+            </delay_matrix>
+          </pb_type>
+          <!-- Define flip-flop -->
+          <pb_type name="ff" blif_model=".latch" num_pb="1" class="flipflop">
+            <input name="D" num_pins="1" port_class="D"/>
+            <output name="Q" num_pins="1" port_class="Q"/>
+            <clock name="clk" num_pins="1" port_class="clock"/>
+            <T_setup value="2.160000e-10" port="ff.D" clock="clk"/>
+            <T_clock_to_Q max="1.426000e-10" port="ff.Q" clock="clk"/>
+          </pb_type>
+          <interconnect>
+            <direct name="direct1" input="ble4.in" output="lut4.in"/>
+              <direct name="direct2" input="lut4.out" output="ff.D">
+              <pack_pattern name="ble4" in_port="lut4.out" out_port="ff.D"/>
+            </direct>
+            <direct name="direct3" input="ble4.clk" output="ff.clk"/>
+             <mux name="mux1" input="ff.Q lut4.out" output="ble4.out">
+            </mux>
+          </interconnect>
+        </pb_type>
+      <interconnect>
+        <complete name="crossbar" input="clb.I ble4[3:0].out" output="ble4[3:0].in">
+          <delay_constant max="5.735000e-11" in_port="clb.I" out_port="ble4[3:0].in"/>
+          <delay_constant max="5.428000e-11" in_port="ble4[3:0].out" out_port="ble4[3:0].in"/>
+        </complete>
+        <complete name="clks" input="clb.clk" output="ble4[3:0].clk">
+        </complete>
+        <direct name="clbouts1" input="ble4[3:0].out" output="clb.O"/>
+      </interconnect>
+    </pb_type>
+  </complexblocklist>
+</architecture>
