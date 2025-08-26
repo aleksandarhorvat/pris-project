@@ -4,8 +4,16 @@ from typing import Dict, List
 class Node:
     def __init__(self, node_id, node_type, ptc, xhigh, xlow, yhigh, ylow):
         self.id = node_id
+        # IPIN, sto oznacava ulazni pin (u arhitekturama koje cemo mi koristiti, ulazni pin klastera ili IO bloka),
+        # OPIN, sto oznacava izlazni pin (u arhitekturama koje cemo mi koristiti, izlazni pin klastera ili IO bloka),
+        # CHANX, sto oznacava horizontalnu prefabrikovanu zicu,
+        # CHANY, sto oznacava vertikalnu prefabrikovanu zicu,
+        # SOURCE, sto je virtuelni cvor koji predstavlja pocetak signala koji moze koristiti vise ekvivalentnih OPIN cvorova,
+        # SINK, sto je virtuelni cvor koji predstavlja kraj signala koji moze koristiti vise ekvivalentnih IPIN cvorova
         self.type = node_type
+        # oznacava redni broj pina, odnosno zice u kanalu
         self.ptc = ptc
+        # xhigh, xlow, yhigh i ylow odredjuju koordinate koje dati cvor zauzima u 2D FPGA matrici. xhigh = xlow i yhigh = ylow.
         self.xhigh = xhigh
         self.xlow = xlow
         self.yhigh = yhigh
@@ -19,7 +27,9 @@ class Node:
 
 class Edge:
     def __init__(self, sink, src):
+        # id uvorisnog cvora
         self.sink = sink
+        # id izvorisnog cvora
         self.src = src
 
     def __str__(self):
@@ -50,6 +60,7 @@ class RRG:
 
 class Net:
     def __init__(self, net_id):
+        #id signala
         self.id = net_id
         self.nodes: Dict[int, Node] = {}
 
@@ -62,6 +73,7 @@ class Net:
 
 class Route:
     def __init__(self):
+        # redni broj signala u route : signal
         self.nets: Dict[int, Net] = {}
 
     def __str__(self):

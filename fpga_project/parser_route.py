@@ -15,7 +15,7 @@ class RouteParser:
                 if not line:
                     continue
 
-                # Početak neta: Net 0 (c0)
+                # Pocetak neta: Net 0 (c0)
                 if line.startswith("Net"):
                     match = re.match(r"Net\s+(\d+)\s+\((.+)\)", line)
                     if match:
