@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from .models import *
 
+
 class RRGParser:
     def __init__(self):
         self.rrg = RRG()
@@ -19,7 +20,8 @@ class RRGParser:
             yhigh = int(loc.get("yhigh"))
             ylow = int(loc.get("ylow"))
             ptc = int(loc.get("ptc"))
-            self.rrg.add_node(Node(node_id, ntype, ptc, xhigh, xlow, yhigh, ylow))
+            self.rrg.add_node(
+                Node(node_id, ntype, ptc, xhigh, xlow, yhigh, ylow))
 
         for edge in root.findall("rr_edges/edge"):
             src = int(edge.get("src_node"))

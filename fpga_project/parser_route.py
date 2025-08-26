@@ -1,6 +1,7 @@
 import re
 from .models import Node, Net, Route
 
+
 class RouteParser:
     def __init__(self):
         self.route = Route()
@@ -37,7 +38,8 @@ class RouteParser:
                         node_type = match.group(2)
                         x = int(match.group(3))
                         y = int(match.group(4))
-                        ptc = int(match.group(5))  # broj posle koordinata (Pad/Track/Pin/Class)
+                        # broj posle koordinata (Pad/Track/Pin/Class)
+                        ptc = int(match.group(5))
 
                         node = Node(
                             node_id=node_id,

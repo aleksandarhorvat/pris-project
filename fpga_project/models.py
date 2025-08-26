@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+
 class Node:
     def __init__(self, node_id, node_type, ptc, xhigh, xlow, yhigh, ylow):
         self.id = node_id
@@ -14,7 +15,8 @@ class Node:
         return (f"Node(id={self.id}, type={self.type}, ptc={self.ptc}, "
                 f"xhigh={self.xhigh}, xlow={self.xlow}, "
                 f"yhigh={self.yhigh}, ylow={self.ylow})")
-    
+
+
 class Edge:
     def __init__(self, sink, src):
         self.sink = sink
@@ -22,7 +24,8 @@ class Edge:
 
     def __str__(self):
         return f"Edge(sink={self.sink}, src={self.src})"
-    
+
+
 class RRG:
     def __init__(self):
         self.nodes: Dict[int, Node] = {}
@@ -43,17 +46,19 @@ class RRG:
         for edge in self.edges:
             result.append(f"  Edge: {edge}")
         return "\n".join(result)
-    
+
+
 class Net:
     def __init__(self, net_id):
         self.id = net_id
         self.nodes: Dict[int, Node] = {}
-    
+
     def __str__(self):
         result = [f"Net {self.id}:"]
         for node_id, node in self.nodes.items():
             result.append(f"  {node}")
         return "\n".join(result)
+
 
 class Route:
     def __init__(self):
