@@ -43,3 +43,29 @@ class RRG:
         for edge in self.edges:
             result.append(f"  Edge: {edge}")
         return "\n".join(result)
+    
+class Net:
+    def __init__(self, net_id):
+        self.id = net_id
+        self.nodes: Dict[int, Node] = {}
+    
+    def __str__(self):
+        result = [f"Net {self.id}:"]
+        for node_id, node in self.nodes.items():
+            result.append(f"  {node}")
+        return "\n".join(result)
+
+class Route:
+    def __init__(self):
+        self.nets: Dict[int, Net] = {}
+
+    def __str__(self):
+        result = ["Route:"]
+        for net_serial_numb, net in self.nets.items():
+            result.append(f"Net {net_serial_numb} {net.id}:")
+            net_lines = str(net).splitlines()
+            for line in net_lines:
+                if line.startswith(f"Net {net.id}:"):
+                    continue
+                result.append(f"    {line}")
+        return "\n".join(result)
