@@ -24,8 +24,8 @@ class RRGParser:
                 Node(node_id, ntype, ptc, xhigh, xlow, yhigh, ylow))
 
         for edge in root.findall("rr_edges/edge"):
-            src = int(edge.get("src_node"))
             sink = int(edge.get("sink_node"))
+            src = int(edge.get("src_node"))
             self.rrg.add_edge(Edge(sink, src))
 
     def get_rrg(self) -> RRG:
