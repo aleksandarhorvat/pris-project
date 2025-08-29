@@ -30,3 +30,4 @@ class RRGParser:
 
     def get_rrg(self) -> RRG:
         return self.rrg
+
