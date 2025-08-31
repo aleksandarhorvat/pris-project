@@ -104,7 +104,6 @@ class FPGAVisualizer:
     def draw_detailed_legend(self):
         legend_elements = []
 
-        # Prvo dodajemo source i sink cvorove rute na vrh legende
         legend_elements.extend([
             plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightblue', markersize=8,
                        label='SOURCE - Početni čvor rute', markeredgecolor='black'),
@@ -116,7 +115,6 @@ class FPGAVisualizer:
                        label='Čvor rute', linestyle='None')
         ])
 
-        # Zatim dodajemo ostale elemente
         for node_type in ['OPIN', 'IPIN', 'CHANX', 'CHANY']:
             color = self.colors[node_type]
             description = self.node_descriptions.get(node_type, node_type)
