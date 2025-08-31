@@ -148,30 +148,53 @@ class FPGAVisualizer:
         self.visualize_fpga_matrix(rrg)
 
         for net_id, net in route.nets.items():
-            if net.nodes:
-                x_coords = []
-                y_coords = []
-                for node in net.nodes:
-                    x_center = (node.xlow + node.xhigh) / 2
-                    y_center = (node.ylow + node.yhigh) / 2
-                    x_coords.append(x_center)
-                    y_coords.append(y_center)
+            nodes_list = net.nodes
+            if not nodes_list:
+                continue
+            
+            x_coords = []
+            y_coords = []
 
-                # ruta i cvorovi
-                self.ax.plot(x_coords, y_coords, 'k-',
-                             linewidth=1.5, alpha=0.7)
-                self.ax.plot(x_coords, y_coords, 'ro', markersize=7, alpha=0.7)
+            drawn_edges = set()
 
-                # belezimo samo pocetni i krajnji cvor rute
-                if len(x_coords) >= 2:
-                    # pocetni
-                    self.ax.text(x_coords[0], y_coords[0] - 0.3, f'S{net_id}',
-                                 ha='center', va='center', fontsize=7,
-                                 bbox=dict(boxstyle="round,pad=0.2", facecolor="lightblue"))
-                    # krajnji
-                    self.ax.text(x_coords[-1], y_coords[-1] - 0.3, f'E{net_id}',
-                                 ha='center', va='center', fontsize=7,
-                                 bbox=dict(boxstyle="round,pad=0.2", facecolor="lightgreen"))
+            for i in range(len(nodes_list) - 1):
+                src = nodes_list[i]
+                dst = nodes_list[i + 1]
+
+                # ako je source == SINK, ne crtamo edge ali nastavljamo dalje
+                if src.type == "SINK":
+                    continue
+
+                x_src = (src.xlow + src.xhigh) / 2
+                y_src = (src.ylow + src.yhigh) / 2
+                x_dst = (dst.xlow + dst.xhigh) / 2
+                y_dst = (dst.ylow + dst.yhigh) / 2
+
+                edge_key = (src.id, dst.id)
+                if edge_key not in drawn_edges:
+                    self.ax.plot([x_src, x_dst], [y_src, y_dst],
+                                 'k-', linewidth=2, alpha=0.8)
+                    drawn_edges.add(edge_key)
+
+            for node in nodes_list:
+                x_center = (node.xlow + node.xhigh) / 2
+                y_center = (node.ylow + node.yhigh) / 2
+                x_coords.append(x_center)
+                y_coords.append(y_center)
+
+            # ruta i cvorovi
+            self.ax.plot(x_coords, y_coords, 'ro', markersize=7, alpha=0.7)
+
+            # belezimo samo pocetni i krajnji cvor rute
+            if len(x_coords) >= 2:
+                # pocetni
+                self.ax.text(x_coords[0], y_coords[0] - 0.3, f'S{net_id}',
+                             ha='center', va='center', fontsize=7,
+                             bbox=dict(boxstyle="round,pad=0.2", facecolor="lightblue"))
+                # krajnji
+                self.ax.text(x_coords[-1], y_coords[-1] - 0.3, f'E{net_id}',
+                             ha='center', va='center', fontsize=7,
+                             bbox=dict(boxstyle="round,pad=0.2", facecolor="lightgreen"))
 
     # prikazivanje jednog signala ciji id je prosledjen
     def visualize_signal(self, route, net_id: int):
