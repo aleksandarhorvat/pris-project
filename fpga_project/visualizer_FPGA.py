@@ -19,8 +19,6 @@ class FPGAVisualizer:
 
         # Node type opis
         self.node_descriptions = {
-            'SOURCE': 'Izlaz logičkog bloka',
-            'SINK': 'Ulaz logičkog bloka',
             'OPIN': 'Izlazni pin',
             'IPIN': 'Ulazni pin',
             'CHANX': 'Horizontalni kanal',
@@ -52,7 +50,6 @@ class FPGAVisualizer:
         plt.tight_layout()
 
     # povlacimo iz parsiranog nodes dimenzije i odredjujemo maksimalne
-
     def get_fpga_dimensions(self, rrg: RRG):
         max_x, max_y = 0, 0
         for node in rrg.nodes.values():
@@ -107,16 +104,24 @@ class FPGAVisualizer:
     def draw_detailed_legend(self):
         legend_elements = []
 
-        for node_type, color in self.colors.items():
+        # Prvo dodajemo source i sink cvorove rute na vrh legende
+        legend_elements.extend([
+            plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightblue', markersize=8,
+                       label='SOURCE - Početni čvor rute', markeredgecolor='black'),
+            plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightgreen', markersize=8,
+                       label='SINK - Krajnji čvor rute', markeredgecolor='black'),
+            plt.Line2D([0], [0], color='black', lw=2,
+                       label='Ruta signala'),
+            plt.Line2D([0], [0], marker='o', color='red', markersize=6,
+                       label='Čvor rute', linestyle='None')
+        ])
+
+        # Zatim dodajemo ostale elemente
+        for node_type in ['OPIN', 'IPIN', 'CHANX', 'CHANY']:
+            color = self.colors[node_type]
             description = self.node_descriptions.get(node_type, node_type)
 
-            if node_type in ['SOURCE', 'SINK']:
-                legend_elements.append(
-                    patches.Patch(facecolor=color,
-                                  edgecolor='black',
-                                  label=f'{node_type}: {description}')
-                )
-            elif node_type in ['OPIN', 'IPIN']:
+            if node_type in ['OPIN', 'IPIN']:
                 marker = '^' if node_type == 'OPIN' else 'v'
                 legend_elements.append(
                     plt.Line2D([0], [0], marker=marker, color='w',
@@ -129,18 +134,6 @@ class FPGAVisualizer:
                     plt.Line2D([0], [0], color=color, lw=3,
                                label=f'{node_type}: {description}')
                 )
-
-        # putanja rutiranja i pocetni i krajnji cvorovi
-        legend_elements.extend([
-            plt.Line2D([0], [0], color='black', lw=2,
-                       label='Ruta signala'),
-            plt.Line2D([0], [0], marker='o', color='red', markersize=6,
-                       label='Čvor rute', linestyle='None'),
-            plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightblue', markersize=8,
-                       label='S - Početni čvor rute', markeredgecolor='black'),
-            plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightgreen', markersize=8,
-                       label='E - Krajnji čvor rute', markeredgecolor='black')
-        ])
 
         legend = self.ax.legend(handles=legend_elements,
                                 loc='center left',
