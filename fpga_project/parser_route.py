@@ -50,7 +50,7 @@ class RouteParser:
                         )
 
                         # dodaj node u trenutni Net
-                        self.route.nets[current_net].nodes[node_id] = node
+                        self.route.nets[current_net].nodes.append(node)
 
     def get_route(self) -> Route:
         return self.route

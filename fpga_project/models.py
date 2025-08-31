@@ -60,13 +60,13 @@ class RRG:
 
 class Net:
     def __init__(self, net_id):
-        #id signala
+        # id signala
         self.id = net_id
-        self.nodes: Dict[int, Node] = {}
+        self.nodes: List[Node] = []
 
     def __str__(self):
         result = [f"Net {self.id}:"]
-        for node_id, node in self.nodes.items():
+        for node in self.nodes:
             result.append(f"  {node}")
         return "\n".join(result)
 
