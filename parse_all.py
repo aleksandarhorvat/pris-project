@@ -1,39 +1,29 @@
 from fpga_project.parser_rrg import RRGParser
 from fpga_project.parser_route import RouteParser
-from fpga_project.visualizer_FPGA import FPGAVisualizer
+from fpga_project.fpga_matrix import FPGAMatrix
+from fpga_project.fpga_routing import FPGARouting
 
 
 def main():
-    # rrpParser = RRGParser()
-    # rrpParser.parse("b9/rrg.xml")
-    # print(rrpParser.get_rrg())
-
-    # parser = RouteParser()
-    # parser.parse("b9/b9.route")
-    # print(parser.get_route())
-
     rrpParser = RRGParser()
     rrpParser.parse("b9/rrg.xml")
     rrg_data = rrpParser.get_rrg()
-    # print(rrpParser.get_rrg())
 
     parser = RouteParser()
     parser.parse("b9/b9.route")
     route_data = parser.get_route()
-    # print(parser.get_route())
 
-    visualizer = FPGAVisualizer()
-    visualizer.visualize_fpga_matrix(rrg_data)
+    matrix_visualizer = FPGAMatrix()
+    matrix_visualizer.visualize_fpga_matrix(rrg_data)
+    matrix_visualizer.show()
 
-    net_id = 10
-    fanout = 5
-    visualizer.visualize_signal(route_data, net_id)
-    # visualizer.visualize_signals_by_branching(route_data, fanout)
+    # routing_visualizer = FPGARouting()
+    # routing_visualizer.visualize_routing(rrg_data, route_data)
+    # routing_visualizer.show()
 
-    # visualizer.save(f"netvisualization{netid}.png")
-    # visualizer.save(f"fanout{fanout}.png")
 
-    visualizer.show()
+    # routing_visualizer.save(f"netvisualization{net_id}.png")
+    # routing_visualizer.save(f"fanout{fanout}.png")
 
 
 if __name__ == "__main__":
