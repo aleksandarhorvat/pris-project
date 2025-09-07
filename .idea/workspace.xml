@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c89fa435-cae2-43e8-ae0e-3967b1bfdc1a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/fpga_project/fpga_routing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fpga_project/parser_rrg.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/parser_rrg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fpga_project/visualizer_FPGA.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_matrix.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fpga_project/fpga_matrix.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_matrix.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parse_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/parse_all.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -45,23 +43,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.parse_all.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "E:/PMF/PRIS/pris-project",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "inlay.hints",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.parse_all.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/PMF/PRIS/pris-project&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -84,7 +82,8 @@
       <workItem from="1756647320963" duration="3439000" />
       <workItem from="1756650909369" duration="1274000" />
       <workItem from="1757152967267" duration="5222000" />
-      <workItem from="1757167170592" duration="5872000" />
+      <workItem from="1757167170592" duration="6073000" />
+      <workItem from="1757253854310" duration="8100000" />
     </task>
     <servers />
   </component>
