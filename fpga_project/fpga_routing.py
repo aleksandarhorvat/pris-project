@@ -1,13 +1,74 @@
 import matplotlib.pyplot as plt
+from matplotlib import patches
+
 from .fpga_matrix import FPGAMatrix
 from .models import RRG
+
 
 class FPGARouting(FPGAMatrix):
     def __init__(self):
         super().__init__()
 
+    def visualize_routing_on_grid(self, rrg: RRG, routing_path, net_id=None):
+        self.routing_path = routing_path
+        self.net_id = net_id
+
+        self.draw_routing_path_on_grid(rrg)
+
+    def draw_routing_path_on_grid(self, rrg: RRG):
+        if not self.routing_path:
+            print("Nemamo rutu")
+            return
+
+        for i in range(len(self.routing_path) - 1):
+            node_id1 = self.routing_path[i]
+            node_id2 = self.routing_path[i + 1]
+
+            # ocigledno nesto fali jer ovo radi :))
+            if node_id1 not in self.coord_map or node_id2 not in self.coord_map:
+                print(f"Upozorenje: Node {node_id1} ili {node_id2} nije na coord_map")
+                continue
+
+            x1, y1 = self.coord_map[node_id1]
+            x2, y2 = self.coord_map[node_id2]
+
+            node1 = rrg.nodes[node_id1]
+            node2 = rrg.nodes[node_id2]
+
+            # io veze
+            if node1.type == 'IO' or node2.type == 'IO':
+                self.ax.plot([x1, x2], [y1, y2],
+                             color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9)
+                continue
+
+            # kanala - kanal veza
+            if node1.type in ['CHANX', 'CHANY'] and node2.type in ['CHANX', 'CHANY']:
+                # ista vrsta kanala, horizontali - horizonatlni npr., ide direktno
+                if node1.type == node2.type:
+                    self.ax.plot([x1, x2], [y1, y2],
+                                 color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9, zorder=15)
+                else:
+                    # razlicita vrsta, moramo skrenuti
+                    if node1.type == 'CHANX':  # Horizontal to Vertical
+                        # hor - ver
+                        self.ax.plot([x1, x2], [y1, y1],
+                                     color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9, zorder=15)
+                        self.ax.plot([x2, x2], [y1, y2],
+                                     color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9, zorder=15)
+                    else:
+                        # ver - hor
+                        self.ax.plot([x1, x1], [y1, y2],
+                                     color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9, zorder=15)
+                        self.ax.plot([x1, x2], [y2, y2],
+                                     color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9, zorder=15)
+            else:
+                # pin - kanal ili kanal - pin veza
+                self.ax.plot([x1, x2], [y1, y2],
+                             color=self.colors['ROUTED_PATH'], linewidth=3, alpha=0.9, zorder=15)
+
+
+    # ovo samo nisam obrisala, sigurno nesto pametno da se iskoristi
     def visualize_routing(self, rrg: RRG, route):
-        self.visualize_fpga_matrix(rrg)
 
         for net_id, net in route.nets.items():
             nodes_list = net.nodes

@@ -12,8 +12,8 @@ class FPGAMatrix:
             'CLB': 'linen',
             'IO': 'brown',
             'ROUTED_PATH': 'red',
-            'SOURCE' : 'lightblue',
-            'SINK' : 'lightyellow'
+            'SOURCE': 'lightblue',
+            'SINK': 'lightgreen'
         }
 
         self.clb_size = 0.5
@@ -23,6 +23,16 @@ class FPGAMatrix:
         self.channel_width = self.num_channels * self.channel_spacing
         self.clb_channel_gap = 1.25
         self.io_clb_gap = 1.25
+
+    def visualize_matrix(self, rrg, num_rows=6, num_cols=6):
+        self.num_rows = num_rows
+        self.num_cols = num_cols
+
+        self.draw_fpga_grid(num_rows, num_cols)
+
+        self.map_rrg_to_grid(rrg, num_rows, num_cols)
+
+        self.draw_detailed_legend()
 
     def draw_fpga_grid(self, num_rows=6, num_cols=6):
         self.ax.clear()
@@ -50,7 +60,7 @@ class FPGAMatrix:
 
                 # crtamo CLB blok
                 clb = patches.Rectangle((x_clb, y_clb), self.clb_size, self.clb_size,
-                                        color=self.colors['CLB'], edgecolor='black', linewidth=1)
+                                        color=self.colors['CLB'])
                 self.ax.add_patch(clb)
                 self.ax.text(x_clb + self.clb_size / 2, y_clb + self.clb_size / 2, 'CLB',
                              ha='center', va='center', color='black', fontweight='bold')
@@ -65,10 +75,74 @@ class FPGAMatrix:
                     channel_y = y_clb + self.clb_size + (self.clb_channel_gap / 2) - (self.channel_width / 2)
                     self.draw_channels(x_clb, channel_y, self.clb_size, is_horizontal=True)
 
-
         self.draw_io_blocks(num_rows, num_cols, start_clb_x, start_clb_y)
 
-        self.draw_detailed_legend()
+
+        self.draw_io_clb_channels(num_rows, num_cols, start_clb_x, start_clb_y)
+
+    def draw_io_blocks(self, num_rows, num_cols, start_clb_x, start_clb_y):
+        for col in range(num_cols):
+            # donji IO
+            x_io = start_clb_x + col * (self.clb_size + self.clb_channel_gap)
+            y_io = 0
+            io = patches.Rectangle((x_io, y_io), self.clb_size, self.clb_size,
+                                   color=self.colors['IO'])
+            self.ax.add_patch(io)
+            self.ax.text(x_io + self.clb_size / 2, y_io + self.clb_size / 2, 'IO',
+                         ha='center', va='center', color='black', fontweight='bold')
+
+            # gornji IO
+            y_io_top = start_clb_y + num_rows * (self.clb_size + self.clb_channel_gap)
+            io_top = patches.Rectangle((x_io, y_io_top), self.clb_size, self.clb_size,
+                                       color=self.colors['IO'])
+            self.ax.add_patch(io_top)
+            self.ax.text(x_io + self.clb_size / 2, y_io_top + self.clb_size / 2, 'IO',
+                         ha='center', va='center', color='black', fontweight='bold')
+
+        for row in range(num_rows):
+            # levi IO
+            x_io_left = 0
+            y_io_left = start_clb_y + row * (self.clb_size + self.clb_channel_gap)
+            io_left = patches.Rectangle((x_io_left, y_io_left), self.clb_size, self.clb_size,
+                                        color=self.colors['IO'])
+            self.ax.add_patch(io_left)
+            self.ax.text(x_io_left + self.clb_size / 2, y_io_left + self.clb_size / 2, 'IO',
+                         ha='center', va='center', color='black', fontweight='bold')
+
+            # desni IO
+            x_io_right = start_clb_x + num_cols * (self.clb_size + self.clb_channel_gap)
+            io_right = patches.Rectangle((x_io_right, y_io_left), self.clb_size, self.clb_size,
+                                         color=self.colors['IO'])
+            self.ax.add_patch(io_right)
+            self.ax.text(x_io_right + self.clb_size / 2, y_io_left + self.clb_size / 2, 'IO',
+                         ha='center', va='center', color='black', fontweight='bold')
+
+    def draw_io_clb_channels(self, num_rows, num_cols, start_clb_x, start_clb_y):
+        # donji io i clb kanali
+        for col in range(num_cols):
+            x_io_bottom = start_clb_x + col * (self.clb_size + self.clb_channel_gap)
+            channel_y = self.io_size + (self.io_clb_gap / 2) - (self.channel_width / 2)
+            self.draw_channels(x_io_bottom, channel_y, self.io_size, is_horizontal=True)
+
+        # gornji io i clb kanali
+        for col in range(num_cols):
+            x_io_top = start_clb_x + col * (self.clb_size + self.clb_channel_gap)
+            y_io_top = start_clb_y + num_rows * (self.clb_size + self.clb_channel_gap)
+            channel_y = y_io_top - self.io_clb_gap + (self.io_clb_gap / 2) - (self.channel_width / 2)
+            self.draw_channels(x_io_top, channel_y, self.io_size, is_horizontal=True)
+
+        # levi io i clb kanali
+        for row in range(num_rows):
+            y_io_left = start_clb_y + row * (self.clb_size + self.clb_channel_gap)
+            channel_x = self.io_size + (self.io_clb_gap / 2) - (self.channel_width / 2)
+            self.draw_channels(channel_x, y_io_left, self.io_size, is_horizontal=False)
+
+        # desni io i clb kanali
+        for row in range(num_rows):
+            y_io_right = start_clb_y + row * (self.clb_size + self.clb_channel_gap)
+            x_io_right = start_clb_x + num_cols * (self.clb_size + self.clb_channel_gap)
+            channel_x = x_io_right - self.io_clb_gap + (self.io_clb_gap / 2) - (self.channel_width / 2)
+            self.draw_channels(channel_x, y_io_right, self.io_size, is_horizontal=False)
 
     # vise kanala
     def draw_channels(self, x, y, length, is_horizontal):
@@ -85,46 +159,7 @@ class FPGAMatrix:
                               color='gray', linewidth=1, alpha=0.7)
                 self.ax.add_line(line)
 
-    def draw_io_blocks(self, num_rows, num_cols, start_clb_x, start_clb_y):
-        for col in range(num_cols):
-
-            # donji IO
-            x_io = start_clb_x + col * (self.clb_size + self.clb_channel_gap)
-            y_io = 0
-            io = patches.Rectangle((x_io, y_io), self.clb_size, self.clb_size,
-                                   color=self.colors['IO'], edgecolor='black', linewidth=1)
-            self.ax.add_patch(io)
-            self.ax.text(x_io + self.clb_size / 2, y_io + self.clb_size / 2, 'IO',
-                         ha='center', va='center', color='black', fontweight='bold')
-
-            # gornji IO
-            y_io_top = start_clb_y + num_rows * (self.clb_size + self.clb_channel_gap)
-            io_top = patches.Rectangle((x_io, y_io_top), self.clb_size, self.clb_size,
-                                       color=self.colors['IO'], edgecolor='black', linewidth=1)
-            self.ax.add_patch(io_top)
-            self.ax.text(x_io + self.clb_size / 2, y_io_top + self.clb_size / 2, 'IO',
-                         ha='center', va='center', color='black', fontweight='bold')
-
-        for row in range(num_rows):
-            # levi IO
-            x_io_left = 0
-            y_io_left = start_clb_y + row * (self.clb_size + self.clb_channel_gap)
-            io_left = patches.Rectangle((x_io_left, y_io_left), self.clb_size, self.clb_size,
-                                        color=self.colors['IO'], edgecolor='black', linewidth=1)
-            self.ax.add_patch(io_left)
-            self.ax.text(x_io_left + self.clb_size / 2, y_io_left + self.clb_size / 2, 'IO',
-                         ha='center', va='center', color='black', fontweight='bold')
-
-            # desni IO
-            x_io_right = start_clb_x + num_cols * (self.clb_size + self.clb_channel_gap)
-            io_right = patches.Rectangle((x_io_right, y_io_left), self.clb_size, self.clb_size,
-                                         color=self.colors['IO'], edgecolor='black', linewidth=1)
-            self.ax.add_patch(io_right)
-            self.ax.text(x_io_right + self.clb_size / 2, y_io_left + self.clb_size / 2, 'IO',
-                         ha='center', va='center', color='black', fontweight='bold')
-
     def map_rrg_to_grid(self, rrg: RRG, num_rows=6, num_cols=6):
-        """Map RRG coordinates to visual grid coordinates"""
         self.coord_map = {}
         self.num_rows = num_rows
         self.num_cols = num_cols
@@ -132,158 +167,169 @@ class FPGAMatrix:
         start_clb_x = self.io_size + self.io_clb_gap
         start_clb_y = self.io_size + self.io_clb_gap
 
-        # Map RRG coordinates to visual positions
+        # mapiramo rrg koordinate na vizuelni prikaz
         for node in rrg.nodes.values():
-            visual_x, visual_y = self._calculate_node_position(node, start_clb_x, start_clb_y)
+            visual_x, visual_y = self.calculate_node_position(node, start_clb_x, start_clb_y)
 
             if visual_x is not None and visual_y is not None:
                 self.coord_map[node.id] = (visual_x, visual_y)
 
-    def _calculate_node_position(self, node, start_clb_x, start_clb_y):
-        """Calculate the visual position for a node based on its type and coordinates"""
-        if node.type in ['SOURCE', 'SINK', 'OPIN', 'IPIN']:
-            # These are typically located at CLB positions
-            if 0 <= node.xlow < self.num_cols and 0 <= node.ylow < self.num_rows:
-                visual_x = start_clb_x + node.xlow * (self.clb_size + self.clb_channel_gap)
-                visual_y = start_clb_y + node.ylow * (self.clb_size + self.clb_channel_gap)
+    def calculate_node_position(self, node, start_clb_x, start_clb_y):
 
-                # Adjust for center of the block
+        if node.type in ['SOURCE', 'SINK', 'OPIN', 'IPIN']:
+            # offset +1 po koordinatama
+            if 1 <= node.xlow <= self.num_cols and 1 <= node.ylow <= self.num_rows:
+                visual_x = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
+                visual_y = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
+
+                # na centar bloka
                 visual_x += self.clb_size / 2
                 visual_y += self.clb_size / 2
 
                 return visual_x, visual_y
 
         elif node.type in ['CHANX', 'CHANY']:
-            # Routing channels - need special handling
-            return self._calculate_channel_position(node, start_clb_x, start_clb_y)
+            # odvojeno ovde se resava offset
+            return self.calculate_channel_position(node, start_clb_x, start_clb_y)
 
         elif node.type == 'IO':
-            # IO blocks - need special handling
-            return self._calculate_io_position(node, start_clb_x, start_clb_y)
+            # odvojeno ovde se resava offset
+            return self.calculate_io_position(node, start_clb_x, start_clb_y)
 
         return None, None
 
-    def _calculate_channel_position(self, node, start_clb_x, start_clb_y):
-        """Calculate position for channel nodes"""
-        if node.type == 'CHANX':  # Horizontal channel
-            # Position in the horizontal channel between rows
-            if 0 <= node.ylow < self.num_rows - 1:
-                y_pos = start_clb_y + node.ylow * (self.clb_size + self.clb_channel_gap) + self.clb_size
+    def calculate_channel_position(self, node, start_clb_x, start_clb_y):
+        # moramo proveriti da li su ovo kanali izmedju clb blokova
+        if (node.type == 'CHANX' and (node.ylow == 0 or node.ylow == self.num_rows)) or \
+                (node.type == 'CHANY' and (node.xlow == 0 or node.xlow == self.num_cols)):
+            return self.calculate_io_clb_channel_position(node, start_clb_x, start_clb_y)
+
+        # horizontalni kanali
+        if node.type == 'CHANX':
+            if 1 <= node.ylow < self.num_rows:
+                # osnovna y pozicija
+                y_pos = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap) + self.clb_size
                 y_pos += (self.clb_channel_gap / 2) - (self.channel_width / 2)
 
-                # X position based on track number
-                x_pos = start_clb_x + node.xlow * (self.clb_size + self.clb_channel_gap)
-                x_pos += (node.ptc % self.num_channels) * self.channel_spacing
+                x_pos = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
 
-                return x_pos, y_pos + (self.channel_spacing * node.ptc)
 
-        elif node.type == 'CHANY':  # Vertical channel
-            # Position in the vertical channel between columns
-            if 0 <= node.xlow < self.num_cols - 1:
-                x_pos = start_clb_x + node.xlow * (self.clb_size + self.clb_channel_gap) + self.clb_size
+                track_offset = node.ptc * self.channel_spacing
+                return x_pos, y_pos + track_offset
+
+        # vertikalni kanali
+        elif node.type == 'CHANY':
+            if 1 <= node.xlow < self.num_cols:
+                # osnovna x pozicija
+                x_pos = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap) + self.clb_size
                 x_pos += (self.clb_channel_gap / 2) - (self.channel_width / 2)
 
-                # Y position based on track number
-                y_pos = start_clb_y + node.ylow * (self.clb_size + self.clb_channel_gap)
-                y_pos += (node.ptc % self.num_channels) * self.channel_spacing
+                # osnovna y pozicija
+                y_pos = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
 
-                return x_pos + (self.channel_spacing * node.ptc), y_pos
+                track_offset = node.ptc * self.channel_spacing
+                return x_pos + track_offset, y_pos
 
         return None, None
 
-    def _calculate_io_position(self, node, start_clb_x, start_clb_y):
-        """Calculate position for IO nodes"""
-        # Bottom IO row
+    # ovde je sve zbog offseta opet stavljeno da se krece od 0,0 pozicije..
+    def calculate_io_position(self, node, start_clb_x, start_clb_y):
+        # donji io red (ylow = 0, yhigh = 0)
         if node.ylow == 0 and node.yhigh == 0:
-            x_pos = start_clb_x + node.xlow * (self.clb_size + self.clb_channel_gap)
-            return x_pos + self.clb_size / 2, self.io_size / 2
+            x_io = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
+            return x_io + self.clb_size / 2, self.io_size / 2
 
-        # Top IO row
+        # gornji io red (ylow = num_rows, yhigh = num_rows)
         elif node.ylow == self.num_rows and node.yhigh == self.num_rows:
-            x_pos = start_clb_x + node.xlow * (self.clb_size + self.clb_channel_gap)
-            y_pos = start_clb_y + self.num_rows * (self.clb_size + self.clb_channel_gap)
-            return x_pos + self.clb_size / 2, y_pos + self.clb_size / 2
+            x_io = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
+            y_io_top = start_clb_y + self.num_rows * (self.clb_size + self.clb_channel_gap)
+            return x_io + self.clb_size / 2, y_io_top + self.io_size / 2
 
-        # Left IO column
+        # levi io red (xlow = 0, xhigh = 0)
         elif node.xlow == 0 and node.xhigh == 0:
-            y_pos = start_clb_y + node.ylow * (self.clb_size + self.clb_channel_gap)
-            return self.io_size / 2, y_pos + self.clb_size / 2
+            y_io_left = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
+            return self.io_size / 2, y_io_left + self.clb_size / 2
 
-        # Right IO column
+        # desni io red (xlow = num_cols, xhigh = num_cols)
         elif node.xlow == self.num_cols and node.xhigh == self.num_cols:
-            x_pos = start_clb_x + self.num_cols * (self.clb_size + self.clb_channel_gap)
-            y_pos = start_clb_y + node.ylow * (self.clb_size + self.clb_channel_gap)
-            return x_pos + self.clb_size / 2, y_pos + self.clb_size / 2
+            x_io_right = start_clb_x + self.num_cols * (self.clb_size + self.clb_channel_gap)
+            y_io_right = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
+            return x_io_right + self.io_size / 2, y_io_right + self.clb_size / 2
 
         return None, None
 
-    def visualize_routing_on_grid(self, rrg: RRG, routing_path, num_rows=6, num_cols=6):
-        """Visualize routing path on the grid"""
-        # Store dimensions for later use
-        self.num_rows = num_rows
-        self.num_cols = num_cols
+    def calculate_io_clb_channel_position(self, node, start_clb_x, start_clb_y):
 
-        # Set routing path
-        self.routing_path = routing_path
+        # horizontani kanali
+        if node.type == 'CHANX':
+            # gornji
+            if node.ylow == 0:
+                y_pos = self.io_size + (self.io_clb_gap / 2) - (self.channel_width / 2)
+                x_base = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
 
-        # Redraw the grid
-        self.draw_fpga_grid(num_rows, num_cols)
+                track_offset = node.ptc * self.channel_spacing
+                return x_base, y_pos + track_offset
+            # donji
+            elif node.ylow == self.num_rows:
+                y_io_top = start_clb_y + self.num_rows * (self.clb_size + self.clb_channel_gap)
+                y_pos = y_io_top - self.io_clb_gap + (self.io_clb_gap / 2) - (self.channel_width / 2)
+                x_base = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
 
-        # Map RRG coordinates to visual grid
-        self.map_rrg_to_grid(rrg, num_rows, num_cols)
+                track_offset = node.ptc * self.channel_spacing
+                return x_base, y_pos + track_offset
 
-        # Draw the routing path
-        self.draw_routing_path_on_grid(rrg)
+        # vertikalni kanali
+        elif node.type == 'CHANY':
+            # levi
+            if node.xlow == 0:
+                x_pos = self.io_size + (self.io_clb_gap / 2) - (self.channel_width / 2)
+                y_base = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
 
-    def draw_routing_path_on_grid(self, rrg: RRG):
-        """Draw routing path on the visual grid"""
-        if not self.routing_path:
-            print("No routing path to visualize")
-            return
+                track_offset = node.ptc * self.channel_spacing
+                return x_pos + track_offset, y_base
 
-        # Draw all connections first
-        for i in range(len(self.routing_path) - 1):
-            node_id1 = self.routing_path[i]
-            node_id2 = self.routing_path[i + 1]
+            # desni
+            elif node.xlow == self.num_cols:
+                x_io_right = start_clb_x + self.num_cols * (self.clb_size + self.clb_channel_gap)
+                x_pos = x_io_right - self.io_clb_gap + (self.io_clb_gap / 2) - (self.channel_width / 2)
+                y_base = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
 
-            if node_id1 in self.coord_map and node_id2 in self.coord_map:
-                x1, y1 = self.coord_map[node_id1]
-                x2, y2 = self.coord_map[node_id2]
+                track_offset = node.ptc * self.channel_spacing
+                return x_pos + track_offset, y_base
 
-                # Draw connection
-                self.ax.plot([x1, x2], [y1, y2],
-                             color=self.colors['ROUTED_PATH'], linewidth=2, alpha=0.8, zorder=5)
+        return None, None
 
-        # Then draw all nodes on top
-        for node_id in self.routing_path:
-            if node_id not in self.coord_map or node_id not in rrg.nodes:
-                continue
+    # samo debug da vidim jel sve lepo, mozemo kasnije obrisati
+    def debug_coordinate_mapping(self, rrg: RRG):
 
-            node = rrg.nodes[node_id]
-            visual_x, visual_y = self.coord_map[node_id]
+        io_clb_count = 0
+        total_count = 0
 
-            # Draw node marker with different styles based on type
-            if node.type in ['CHANX', 'CHANY']:
-                # For channels, draw a circle
-                self.ax.scatter(visual_x, visual_y, color=self.colors['ROUTED_PATH'],
-                                s=80, edgecolor='black', zorder=6)
-            elif node.type == 'SOURCE':
-                # For source nodes, draw a special marker
-                self.ax.scatter(visual_x, visual_y, color=self.colors['SOURCE'],
-                                s=100, edgecolor='black', marker='s', zorder=7)
-            elif node.type == 'SINK':
-                # For sink nodes, draw a special marker
-                self.ax.scatter(visual_x, visual_y, color=self.colors['SINK'],
-                                s=100, edgecolor='black', marker='s', zorder=7)
-            else:
-                # For other nodes, draw a square
-                size = 0.1
-                rect = patches.Rectangle((visual_x - size / 2, visual_y - size / 2),
-                                         size, size,
-                                         facecolor=self.colors['ROUTED_PATH'],
-                                         edgecolor='black', zorder=6)
-                self.ax.add_patch(rect)
+        for node_id, node in rrg.nodes.items():
+            visual_x, visual_y = self.calculate_node_position(
+                node, self.io_size + self.io_clb_gap, self.io_size + self.io_clb_gap
+            )
 
+            # samo proveravamo da li su kanali izmedju io i clb blokova
+            if visual_x is not None and visual_y is not None:
+                is_io_clb_channel = False
+                if node.type in ['CHANX', 'CHANY']:
+                    if (node.ylow == 0 or node.ylow == self.num_rows or
+                            node.xlow == 0 or node.xlow == self.num_cols):
+                        is_io_clb_channel = True
+                        io_clb_count += 1
+
+                self.ax.scatter(visual_x, visual_y, color='red', s=20, zorder=20)
+                total_count += 1
+
+    def debug_io_nodes(self, rrg: RRG):
+        print("IO:")
+        for node_id, node in rrg.nodes.items():
+            if node.type == 'IO':
+                print(
+                    f"Node {node_id}: type={node.type}, xlow={node.xlow}, xhigh={node.xhigh}, ylow={node.ylow}, yhigh={node.yhigh}")
+
+    # ovo izignorisite, naknadno cu samo prepraviti, nije bitno
     def draw_detailed_legend(self):
         legend_elements = []
 
@@ -293,7 +339,7 @@ class FPGAMatrix:
                        label='SOURCE - Početni čvor rute', markeredgecolor='black'),
             plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightgreen', markersize=8,
                        label='SINK - Krajnji čvor rute', markeredgecolor='black'),
-            plt.Line2D([0], [0], color='black', lw=2,
+            plt.Line2D([0], [0], color='red', lw=2,
                        label='Ruta signala'),
             plt.Line2D([0], [0], marker='o', color='red', markersize=6,
                        label='Čvor rute', linestyle='None')
