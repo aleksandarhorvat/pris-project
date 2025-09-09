@@ -11,7 +11,7 @@ class FPGAMatrix:
         self.colors = {
             'CLB': 'linen',
             'IO': 'brown',
-            'ROUTED_PATH': 'red',
+            'ROUTED_PATH': 'black',
             'SOURCE': 'lightblue',
             'SINK': 'lightgreen'
         }
@@ -159,6 +159,7 @@ class FPGAMatrix:
                               color='gray', linewidth=1, alpha=0.7)
                 self.ax.add_line(line)
 
+    # popravljeno, radi za sada
     def map_rrg_to_grid(self, rrg: RRG, num_rows=6, num_cols=6):
         self.coord_map = {}
         self.num_rows = num_rows
@@ -167,15 +168,67 @@ class FPGAMatrix:
         start_clb_x = self.io_size + self.io_clb_gap
         start_clb_y = self.io_size + self.io_clb_gap
 
-        # mapiramo rrg koordinate na vizuelni prikaz
-        for node in rrg.nodes.values():
-            visual_x, visual_y = self.calculate_node_position(node, start_clb_x, start_clb_y)
+        cell_w = self.clb_size + self.clb_channel_gap
+        cell_h = self.clb_size + self.clb_channel_gap
 
-            if visual_x is not None and visual_y is not None:
-                self.coord_map[node.id] = (visual_x, visual_y)
+        # unutrašnji offset kanala (isti koji koristiš u draw_fpga_grid)
+        channel_x_inner_offset = (self.clb_channel_gap / 2) - (self.channel_width / 2)
+        channel_y_inner_offset = (self.clb_channel_gap / 2) - (self.channel_width / 2)
+
+        for node in rrg.nodes.values():
+            try:
+                vx, vy = self.calculate_node_position(node, start_clb_x, start_clb_y)
+            except Exception:
+                vx = vy = None
+
+            if vx is not None and vy is not None:
+                self.coord_map[node.id] = (vx, vy)
+                continue
+
+            # fallback — eksplicitna mapiranja koja repliciraju draw_* logiku
+            if node.type not in ['CHANX', 'CHANY']:
+                # CLB/IPIN/OPIN/SOURCE/SINK: koristi centar CLB polja
+                # (RRG xlow/ylow su 1-based za CLB polja — zato -1)
+                visual_x = start_clb_x + (node.xlow - 1) * cell_w + self.clb_size / 2
+                visual_y = start_clb_y + (node.ylow - 1) * cell_h + self.clb_size / 2
+
+            elif node.type == 'CHANX':
+                # IO<->CLB horizontalni kanali (ylow == 0 ili ylow == num_rows)
+                if node.ylow == 0 or node.ylow == self.num_rows:
+                    coord = self.calculate_io_clb_channel_position(node, start_clb_x, start_clb_y)
+                    if coord is not None:
+                        self.coord_map[node.id] = coord
+                    continue
+
+                # horizontalni kanal između redova CLB
+                # Centar kanala je na sredini CLB širine (x) i na odgovarajućoj y poziciji kanala
+                x_base = start_clb_x + (node.xlow - 1) * cell_w
+                y_channel = start_clb_y + (node.ylow - 1) * cell_h + self.clb_size + channel_y_inner_offset
+                # Stavimo CHANX tačku u centar horizontalnog segmenta (sredina CLB širine)
+                visual_x = x_base + self.clb_size / 2
+                visual_y = y_channel + node.ptc * self.channel_spacing
+
+            elif node.type == 'CHANY':
+                # IO<->CLB vertikalni kanali (xlow == 0 ili xlow == num_cols)
+                if node.xlow == 0 or node.xlow == self.num_cols:
+                    coord = self.calculate_io_clb_channel_position(node, start_clb_x, start_clb_y)
+                    if coord is not None:
+                        self.coord_map[node.id] = coord
+                    continue
+
+                # vertikalni kanal između kolona CLB
+                # Centar kanala je na sredini CLB visine (y) i na odgovarajućoj x poziciji kanala
+                x_channel = start_clb_x + (node.xlow - 1) * cell_w + self.clb_size + channel_x_inner_offset
+                y_base = start_clb_y + (node.ylow - 1) * cell_h
+                visual_x = x_channel + node.ptc * self.channel_spacing
+                visual_y = y_base + self.clb_size / 2
+
+            else:
+                continue
+
+            self.coord_map[node.id] = (visual_x, visual_y)
 
     def calculate_node_position(self, node, start_clb_x, start_clb_y):
-
         if node.type in ['SOURCE', 'SINK', 'OPIN', 'IPIN']:
             # offset +1 po koordinatama
             if 1 <= node.xlow <= self.num_cols and 1 <= node.ylow <= self.num_rows:
@@ -259,7 +312,6 @@ class FPGAMatrix:
         return None, None
 
     def calculate_io_clb_channel_position(self, node, start_clb_x, start_clb_y):
-
         # horizontani kanali
         if node.type == 'CHANX':
             # gornji
@@ -336,13 +388,13 @@ class FPGAMatrix:
         # Prvo dodajemo source i sink cvorove rute na vrh legende
         legend_elements.extend([
             plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightblue', markersize=8,
-                       label='SOURCE - Početni čvor rute', markeredgecolor='black'),
+                       label='SOURCE - Početni čvor rute(node_id)', markeredgecolor='black'),
             plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='lightgreen', markersize=8,
-                       label='SINK - Krajnji čvor rute', markeredgecolor='black'),
-            plt.Line2D([0], [0], color='red', lw=2,
+                       label='SINK - Krajnji čvor rute(node_id)', markeredgecolor='black'),
+            plt.Line2D([0], [0], color='black', lw=2,
                        label='Ruta signala'),
-            plt.Line2D([0], [0], marker='o', color='red', markersize=6,
-                       label='Čvor rute', linestyle='None')
+            plt.Line2D([0], [0], marker='v', color='black', markersize=6,
+                       label='Putanja rute', linestyle='None')
         ])
         legend = self.ax.legend(handles=legend_elements,
                                 loc='center left',

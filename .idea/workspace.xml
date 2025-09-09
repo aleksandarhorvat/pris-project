@@ -8,76 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fpga_project/fpga_matrix.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_matrix.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fpga_project/fpga_routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_routing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_10_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_11_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_12_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_13_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_14_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_15_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_16_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_17_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_18_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_19_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_20_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_21_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_22_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_23_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_24_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_25_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_26_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_27_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_28_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_29_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_30_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_31_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_32_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_33_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_34_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_35_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_36_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_37_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_38_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_39_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_3_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_40_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_41_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_42_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_43_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_44_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_45_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_46_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_47_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_48_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_49_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_4_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_50_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_51_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_52_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_53_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_54_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_55_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_56_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_57_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_58_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_59_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_5_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_60_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_61_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_62_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_63_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_64_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_65_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_66_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_67_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_68_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_69_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_6_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_70_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_71_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_72_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_7_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_8_visualization.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/net_9_visualization.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/parse_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/parse_all.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -155,7 +85,9 @@
       <workItem from="1757152967267" duration="5222000" />
       <workItem from="1757167170592" duration="6073000" />
       <workItem from="1757253854310" duration="8100000" />
-      <workItem from="1757325679020" duration="16033000" />
+      <workItem from="1757325679020" duration="16462000" />
+      <workItem from="1757347263650" duration="120000" />
+      <workItem from="1757413537862" duration="6885000" />
     </task>
     <servers />
   </component>

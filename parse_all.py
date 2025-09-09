@@ -22,12 +22,12 @@ def main():
     # visualizer.show()
 
     if route_data.nets:
-        first_net_id = list(route_data.nets.keys())[5]
-        net = route_data.nets[first_net_id]
+        net_id = list(route_data.nets.keys())[1]
+        net = route_data.nets[net_id]
 
         routing_path = [node.id for node in net.nodes]
 
-        visualizer.visualize_routing_on_grid(rrg, routing_path, first_net_id)
+        visualizer.visualize_routing_on_grid(rrg, routing_path, net_id)
 
     visualizer.show()
 
