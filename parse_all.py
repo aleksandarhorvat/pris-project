@@ -29,6 +29,10 @@ def main():
 
         visualizer.visualize_routing_on_grid(rrg, routing_path, net_id)
 
+    # visualizer.save("proba.pdf", format='pdf')
+    visualizer.save("proba.png", format='png')
+
+
     visualizer.show()
 
 if __name__ == "__main__":
