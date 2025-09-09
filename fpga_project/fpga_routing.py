@@ -39,11 +39,16 @@ class FPGARouting(FPGAMatrix):
                 signal_flow[node_id1] = []
             signal_flow[node_id1].append(node_id2)
 
+        # skupljamo sve sinkove
+        sink_nodes = []
+        for node_id in self.routing_path:
+            if rrg.nodes[node_id].type == "SINK":
+                if node_id in self.coord_map:
+                    sink_nodes.append((node_id, self.coord_map[node_id]))
 
         for i in range(len(self.routing_path) - 1):
             node_id1 = self.routing_path[i]
             node_id2 = self.routing_path[i + 1]
-
 
             if (rrg.nodes[node_id1].type == "SINK" or
                     rrg.nodes[node_id2].type == "SINK"):
@@ -92,7 +97,6 @@ class FPGARouting(FPGAMatrix):
                 arrow_x = x1 + 0.7 * dx
                 arrow_y = y1 + 0.7 * dy
                 arrow_positions.append((arrow_x, arrow_y, dx_norm, dy_norm))
-
 
             # kanal-kanal veza
             if node1.type in ['CHANX', 'CHANY'] and node2.type in ['CHANX', 'CHANY']:
@@ -166,19 +170,20 @@ class FPGARouting(FPGAMatrix):
             if dx_norm != 0 or dy_norm != 0:
                 # duzina repa strelice da ne bude predugacko
                 tail_length = 0.05
-                self.ax.arrow(arrow_x, arrow_y, dx_norm * tail_length, dy_norm * tail_length, head_width=0.09, head_length=0.09,
+                self.ax.arrow(arrow_x, arrow_y, dx_norm * tail_length, dy_norm * tail_length, head_width=0.09,
+                              head_length=0.09,
                               fc=self.colors['ROUTED_PATH'],
                               ec=self.colors['ROUTED_PATH'])
 
-        # labele za sink i source
+        # labele za source
         if len(node_ids) >= 2:
-            # source
             self.ax.text(x_coords[0], y_coords[0] - 0.3, f'{node_ids[0]}',
                          ha='center', va='center', fontsize=7,
                          bbox=dict(boxstyle="round,pad=0.2", facecolor="lightblue"))
 
-            # sink
-            self.ax.text(x_coords[-1], y_coords[-1] - 0.3, f'{node_ids[-1]}',
+        # labele za sve sink
+        for node_id, (x, y) in sink_nodes:
+            self.ax.text(x, y - 0.3, f'{node_id}',
                          ha='center', va='center', fontsize=7,
                          bbox=dict(boxstyle="round,pad=0.2", facecolor="lightgreen"))
 
