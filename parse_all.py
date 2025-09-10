@@ -13,6 +13,8 @@ def main():
     parser.parse("b9/b9.route")
     route_data = parser.get_route()
 
+    branching_factor = 2
+    
 
     # zbog nasledjivanja koristimo routing a ne matrix
     visualizer = FPGARouting()
@@ -27,10 +29,11 @@ def main():
 
         routing_path = [node.id for node in net.nodes]
 
-        visualizer.visualize_routing_on_grid(rrg, routing_path, net_id)
+        #visualizer.visualize_routing_on_grid(rrg, routing_path, net_id)
 
+    visualizer.visualize_routing_by_branching(rrg,route_data, branching_factor)
     # visualizer.save("proba.pdf", format='pdf')
-    visualizer.save("proba.png", format='png')
+    # visualizer.save("grananje2.png", format='png')
 
 
     visualizer.show()
