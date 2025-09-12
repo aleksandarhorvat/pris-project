@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from bokeh.colors.named import lemonchiffon
 from matplotlib import patches
 
 from .fpga_matrix import FPGAMatrix
@@ -314,3 +315,144 @@ class FPGARouting(FPGAMatrix):
                     self.ax.text(x_pos, y_pos + offset - 0.3, label_text,
                                  ha="center", va="center", fontsize=8,
                                  bbox=dict(boxstyle="round,pad=0.2", facecolor=facecolor))
+
+    def hpwl_all_signals(self, rrg: RRG, route):
+
+        hpwl_results = {}
+
+        for net_id, net in route.nets.items():
+
+            nodes = net.nodes
+            x_coords, y_coords = [], []
+
+            for node in nodes:
+                if node.id in self.coord_map:
+                    x, y = self.coord_map[node.id]
+                    x_coords.append(x)
+                    y_coords.append(y)
+                else:
+                    try:
+                        start_clb_x = self.io_size + self.io_clb_gap
+                        start_clb_y = self.io_size + self.io_clb_gap
+                        x, y = self.calculate_node_position(node, start_clb_x, start_clb_y)
+
+                        if x is not None and y is not None:
+                            x_coords.append(x)
+                            y_coords.append(y)
+                            self.coord_map[node.id] = (x, y)
+                    except:
+                        print(f"Nije moguce dobiti koordinatu za cvor {node.id}")
+                        continue
+
+            if x_coords and y_coords:
+                x_min, x_max = min(x_coords), max(x_coords)
+                y_min, y_max = min(y_coords), max(y_coords)
+                hpwl = (x_max - x_min) + (y_max - y_min)
+                hpwl_results[net_id] = hpwl
+            else:
+                hpwl_results[net_id] = 0
+                print(f"Signal {net_id} nema validnih koordinata")
+
+        return hpwl_results
+
+    def save_hpwl(self, hpwl_results, filename="hpwl_metrika.txt"):
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write("HPWL METRIKA\n")
+                f.write("*" * 25 + "\n")
+
+                total_hpwl = 0
+                for net_id, hpwl in hpwl_results.items():
+                    f.write(f"Signal {net_id}: HPWL = {hpwl:.2f}\n")
+                    total_hpwl += hpwl
+
+                avg_hpwl = total_hpwl / len(hpwl_results) if hpwl_results else 0
+                max_hpwl = max(hpwl_results.values()) if hpwl_results else 0
+                min_hpwl = min(hpwl_results.values()) if hpwl_results else 0
+
+                f.write("\n" + "*" * 25 + "\n")
+                f.write(f"Ukupan HPWL: {total_hpwl:.2f}\n")
+                f.write(f"Prosečan HPWL: {avg_hpwl:.2f}\n")
+                f.write(f"Maksimalni HPWL: {max_hpwl:.2f}\n")
+                f.write(f"Minimalni HPWL: {min_hpwl:.2f}\n")
+                f.write("*" * 25 + "\n")
+
+            print(f"HPWL metrike su sačuvane u fajl: {filename}")
+
+        except Exception as e:
+            print(f"Greška pri snimanju HPWL metrika u fajl: {e}")
+
+    # default neka bude 5, a moze se pozivati i vise naravno, dole imamo ogranicenje ako korisnik zeli vise signala nego sto je dostupno
+    def get_signals_with_largest_bboxes(self, rrg: RRG, route, top_n = 5):
+
+        signal_bboxes = []
+
+        for net_id, net in route.nets.items():
+            x_coords, y_coords = [], []
+
+            for node in net.nodes:
+                if node.id in self.coord_map:
+                    x, y = self.coord_map[node.id]
+                    x_coords.append(x)
+                    y_coords.append(y)
+                else:
+                    try:
+                        start_clb_x = self.io_size + self.io_clb_gap
+                        start_clb_y = self.io_size + self.io_clb_gap
+                        x, y = self.calculate_node_position(node, start_clb_x, start_clb_y)
+
+                        if x is not None and y is not None:
+                            x_coords.append(x)
+                            y_coords.append(y)
+                            self.coord_map[node.id] = (x, y)
+                    except:
+                        print(f"Nije moguce dobiti koordinatu za cvor {node.id}")
+                        continue
+
+            if x_coords and y_coords:
+                x_min, x_max = min(x_coords), max(x_coords)
+                y_min, y_max = min(y_coords), max(y_coords)
+                width = x_max - x_min
+                height = y_max - y_min
+                area = width * height
+
+                bbox_coords = (x_min, y_min, x_max, y_max)
+                signal_bboxes.append((net_id, bbox_coords, area))
+
+        signal_bboxes.sort(key=lambda x : x[2], reverse=True)
+
+        if top_n > len(signal_bboxes):
+            print(f"Greska, dostupno je {len(signal_bboxes)} signala")
+            return False
+
+        return True, signal_bboxes[:top_n]
+
+
+    def visualize_largest_bboxes(self, largest_bboxes):
+
+        if not largest_bboxes:
+            print("Greska, nema signala sa validnim bounding boxom")
+            return
+
+        colors = plt.cm.tab10.colors
+
+        for i, (net_id, bbox_coords, area) in enumerate(largest_bboxes):
+            x_min, y_min, x_max, y_max = bbox_coords
+            width = x_max - x_min
+            height = y_max - y_min
+
+            bbox = patches.Rectangle(
+                (x_min, y_min), width, height,
+                linewidth=2, edgecolor=colors[i % len(colors)],
+                facecolor='none', linestyle='--', alpha=0.8
+            )
+            self.ax.add_patch(bbox)
+
+            label = f"Net {net_id}\nOblast: {area:.2f}"
+            self.ax.text(
+                x_min + width/ 3, y_min - 0.5, label,
+                ha='center', va='top',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor=colors[i % len(colors)], alpha=0.7),
+                fontsize=8
+            )
+    

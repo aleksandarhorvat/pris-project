@@ -7,7 +7,7 @@
     <list default="true" id="c89fa435-cae2-43e8-ae0e-3967b1bfdc1a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fpga_project/fpga_routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_routing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proba.png" beforeDir="false" afterPath="$PROJECT_DIR$/proba.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parse_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/parse_all.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +87,9 @@
       <workItem from="1757325679020" duration="16462000" />
       <workItem from="1757347263650" duration="120000" />
       <workItem from="1757413537862" duration="7777000" />
-      <workItem from="1757421819078" duration="388000" />
+      <workItem from="1757421819078" duration="992000" />
+      <workItem from="1757517915069" duration="126000" />
+      <workItem from="1757690320916" duration="5934000" />
     </task>
     <servers />
   </component>

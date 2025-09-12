@@ -1,0 +1,82 @@
+HPWL METRIKA
+*************************
+Signal 0: HPWL = 13.37
+Signal 1: HPWL = 7.64
+Signal 2: HPWL = 4.98
+Signal 3: HPWL = 7.52
+Signal 4: HPWL = 14.00
+Signal 5: HPWL = 9.14
+Signal 6: HPWL = 6.62
+Signal 7: HPWL = 6.38
+Signal 8: HPWL = 10.50
+Signal 9: HPWL = 8.00
+Signal 10: HPWL = 9.75
+Signal 11: HPWL = 4.75
+Signal 12: HPWL = 4.99
+Signal 13: HPWL = 3.50
+Signal 14: HPWL = 4.50
+Signal 15: HPWL = 2.99
+Signal 16: HPWL = 7.76
+Signal 17: HPWL = 3.75
+Signal 18: HPWL = 3.75
+Signal 19: HPWL = 5.77
+Signal 20: HPWL = 9.99
+Signal 21: HPWL = 6.25
+Signal 22: HPWL = 2.00
+Signal 23: HPWL = 5.50
+Signal 24: HPWL = 2.51
+Signal 25: HPWL = 2.00
+Signal 26: HPWL = 3.75
+Signal 27: HPWL = 7.13
+Signal 28: HPWL = 12.50
+Signal 29: HPWL = 5.89
+Signal 30: HPWL = 8.24
+Signal 31: HPWL = 4.86
+Signal 32: HPWL = 4.87
+Signal 33: HPWL = 9.75
+Signal 34: HPWL = 4.98
+Signal 35: HPWL = 7.88
+Signal 36: HPWL = 6.62
+Signal 37: HPWL = 4.26
+Signal 38: HPWL = 2.00
+Signal 39: HPWL = 3.75
+Signal 40: HPWL = 3.75
+Signal 41: HPWL = 6.62
+Signal 42: HPWL = 5.25
+Signal 43: HPWL = 4.38
+Signal 44: HPWL = 6.25
+Signal 45: HPWL = 8.88
+Signal 46: HPWL = 9.14
+Signal 47: HPWL = 6.49
+Signal 48: HPWL = 8.23
+Signal 49: HPWL = 6.01
+Signal 50: HPWL = 3.75
+Signal 51: HPWL = 2.00
+Signal 52: HPWL = 2.00
+Signal 53: HPWL = 2.00
+Signal 54: HPWL = 5.25
+Signal 55: HPWL = 4.14
+Signal 56: HPWL = 5.25
+Signal 57: HPWL = 3.23
+Signal 58: HPWL = 2.51
+Signal 59: HPWL = 4.74
+Signal 60: HPWL = 2.00
+Signal 61: HPWL = 3.75
+Signal 62: HPWL = 2.00
+Signal 63: HPWL = 4.14
+Signal 64: HPWL = 2.00
+Signal 65: HPWL = 2.40
+Signal 66: HPWL = 3.12
+Signal 67: HPWL = 2.63
+Signal 68: HPWL = 2.88
+Signal 69: HPWL = 2.52
+Signal 70: HPWL = 2.52
+Signal 71: HPWL = 6.38
+Signal 72: HPWL = 9.74
+
+*************************
+Ukupan HPWL: 400.38
+Prosečan HPWL: 5.48
+Maksimalni HPWL: 14.00
+Minimalni HPWL: 2.00
+*************************
