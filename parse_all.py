@@ -2,7 +2,7 @@ from fpga_project.parser_rrg import RRGParser
 from fpga_project.parser_route import RouteParser
 from fpga_project.fpga_matrix import FPGAMatrix
 from fpga_project.fpga_routing import FPGARouting
-from fpga_project.fpga_segments import FPGASegments
+from fpga_project.fpga_wires import FPGAWires
 
 
 def main():
@@ -41,11 +41,11 @@ def main():
     #visualizer.show()
 
     # zagusenje segmenta
-    visualizer_segments = FPGASegments()
+    visualizer_segments = FPGAWires()
     visualizer_segments.visualize_matrix(rrg)
     
     if route_data.nets:
-        visualizer_segments.visualize_congestion(route_data, rrg, 0)
+        visualizer_segments.visualize_wire_congestion(route_data, rrg, 0)
     
     visualizer_segments.save("zagusenje_finalno.png",format='png')
     #visualizer_segments.save("zagusenje_iteracija_005.png",format='png')
