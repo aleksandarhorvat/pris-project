@@ -19,7 +19,7 @@ def main():
     
 
     # zbog nasledjivanja koristimo routing a ne matrix
-    # visualizer = FPGARouting()
+    visualizer = FPGARouting()
     # visualizer.visualize_matrix(rrg)
     # visualizer.debug_coordinate_mapping(rrg)
     # visualizer.debug_io_nodes(rrg)
@@ -33,9 +33,7 @@ def main():
         visualizer.visualize_largest_bboxes(result)
 
         net_id = list(route_data.nets.keys())[1]
-        net = route_data.nets[net_id]=    # if route_data.nets:
-    #     net_id = list(route_data.nets.keys())[1]
-    #     net = route_data.nets[net_id]
+        net = route_data.nets[net_id]
 
     #     routing_path = [node.id for node in net.nodes]
 

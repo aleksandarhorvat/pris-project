@@ -5,11 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c89fa435-cae2-43e8-ae0e-3967b1bfdc1a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/fpga_project/fpga_wires.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/grananje2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/grananje5.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zagusenje_finalno.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zagusenje_iteracija_005.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fpga_project/fpga_routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_routing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parse_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/parse_all.py" afterDir="false" />
     </list>
@@ -52,7 +47,7 @@
     "Python.parse_all.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "E:/PMF/PRIS/pris-project",
     "node.js.detected.package.eslint": "true",
@@ -93,7 +88,7 @@
       <workItem from="1757413537862" duration="7777000" />
       <workItem from="1757421819078" duration="992000" />
       <workItem from="1757517915069" duration="126000" />
-      <workItem from="1757690320916" duration="6237000" />
+      <workItem from="1757690320916" duration="6937000" />
     </task>
     <servers />
   </component>

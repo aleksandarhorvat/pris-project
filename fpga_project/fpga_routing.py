@@ -484,11 +484,5 @@ class FPGARouting(FPGAMatrix):
                 fontsize=8
             )
     
-                    self.ax.text(
-                        x_pos, y_pos + offset - 0.3, label_text,
-                        ha="center", va="center", fontsize=6,   # smanjena veličina fonta
-                        bbox=dict(boxstyle="round,pad=0.1", facecolor=facecolor)  # manji padding
-                    )
-   
    
    
