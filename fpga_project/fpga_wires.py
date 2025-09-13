@@ -11,7 +11,7 @@ class FPGAWires(FPGAMatrix):
     def __init__(self):
         super().__init__()
 
-    def visualize_wire_congestion(self, route, rrg, iteration):
+    def visualize_wire_congestion(self, rrg, route, iteration):
         # izdvojimo sve žice (CHANX/CHANY čvorove)
         wires = {node.id: node for node in rrg.nodes.values() if node.type in [
             'CHANX', 'CHANY']}
@@ -76,7 +76,7 @@ class FPGAWires(FPGAMatrix):
         # vraćamo i mapu signala po žici ako bude potrebno
         return wire_signals
 
-    def visualize_segment_wire_usage(self, route, rrg, iteration):
+    def visualize_segment_wire_usage(self, rrg, route, iteration):
         # 1. Dobavi wire_load iz visualize_wire_congestion logike
         wires = [node for node in rrg.nodes.values() if node.type in ['CHANX', 'CHANY']]
         wire_load = {wire.id: 0 for wire in wires}

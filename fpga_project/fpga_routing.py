@@ -341,8 +341,8 @@ class FPGARouting(FPGAMatrix):
                     facecolor = "lightblue" if node.type == 'SOURCE' else "lightgreen"
 
                     self.ax.text(x_pos, y_pos + offset - 0.3, label_text,
-                                 ha="center", va="center", fontsize=8,
-                                 bbox=dict(boxstyle="round,pad=0.2", facecolor=facecolor))
+                                 ha="center", va="center", fontsize=6,
+                                 bbox=dict(boxstyle="round,pad=0.1", facecolor=facecolor))
 
     def hpwl_all_signals(self, rrg: RRG, route):
 

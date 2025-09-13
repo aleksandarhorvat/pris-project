@@ -245,10 +245,6 @@ class FPGAMatrix:
             # odvojeno ovde se resava offset
             return self.calculate_channel_position(node, start_clb_x, start_clb_y)
 
-        elif node.type == 'IO':
-            # odvojeno ovde se resava offset
-            return self.calculate_io_position(node, start_clb_x, start_clb_y)
-
         return None, None
 
     def calculate_channel_position(self, node, start_clb_x, start_clb_y):
@@ -282,32 +278,6 @@ class FPGAMatrix:
 
                 track_offset = node.ptc * self.channel_spacing
                 return x_pos + track_offset, y_pos
-
-        return None, None
-
-    # ovde je sve zbog offseta opet stavljeno da se krece od 0,0 pozicije..
-    def calculate_io_position(self, node, start_clb_x, start_clb_y):
-        # donji io red (ylow = 0, yhigh = 0)
-        if node.ylow == 0 and node.yhigh == 0:
-            x_io = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
-            return x_io + self.clb_size / 2, self.io_size / 2
-
-        # gornji io red (ylow = num_rows, yhigh = num_rows)
-        elif node.ylow == self.num_rows and node.yhigh == self.num_rows:
-            x_io = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
-            y_io_top = start_clb_y + self.num_rows * (self.clb_size + self.clb_channel_gap)
-            return x_io + self.clb_size / 2, y_io_top + self.io_size / 2
-
-        # levi io red (xlow = 0, xhigh = 0)
-        elif node.xlow == 0 and node.xhigh == 0:
-            y_io_left = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
-            return self.io_size / 2, y_io_left + self.clb_size / 2
-
-        # desni io red (xlow = num_cols, xhigh = num_cols)
-        elif node.xlow == self.num_cols and node.xhigh == self.num_cols:
-            x_io_right = start_clb_x + self.num_cols * (self.clb_size + self.clb_channel_gap)
-            y_io_right = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
-            return x_io_right + self.io_size / 2, y_io_right + self.clb_size / 2
 
         return None, None
 
@@ -373,13 +343,37 @@ class FPGAMatrix:
 
                 self.ax.scatter(visual_x, visual_y, color='red', s=20, zorder=20)
                 total_count += 1
+        
+        # Now, mark IO blocks from grid logic (blue squares)
+        start_clb_x = self.io_size + self.io_clb_gap
+        start_clb_y = self.io_size + self.io_clb_gap
+        num_rows = getattr(self, 'num_rows', 6)
+        num_cols = getattr(self, 'num_cols', 6)
 
-    def debug_io_nodes(self, rrg: RRG):
-        print("IO:")
-        for node_id, node in rrg.nodes.items():
-            if node.type == 'IO':
-                print(
-                    f"Node {node_id}: type={node.type}, xlow={node.xlow}, xhigh={node.xhigh}, ylow={node.ylow}, yhigh={node.yhigh}")
+        # Bottom and top IO blocks
+        for col in range(num_cols):
+            x_io = start_clb_x + col * (self.clb_size + self.clb_channel_gap)
+            y_io = 0
+            self.ax.scatter(x_io + self.clb_size / 2, y_io + self.clb_size / 2, color='blue', s=40, zorder=21)
+            total_count += 1
+
+            y_io_top = start_clb_y + num_rows * (self.clb_size + self.clb_channel_gap)
+            self.ax.scatter(x_io + self.clb_size / 2, y_io_top + self.clb_size / 2, color='blue', s=40, zorder=21)
+            total_count += 1
+
+        # Left and right IO blocks
+        for row in range(num_rows):
+            y_io_left = start_clb_y + row * (self.clb_size + self.clb_channel_gap)
+            x_io_left = 0
+            self.ax.scatter(x_io_left + self.clb_size / 2, y_io_left + self.clb_size / 2, color='blue', s=40, zorder=21)
+            total_count += 1
+
+            x_io_right = start_clb_x + num_cols * (self.clb_size + self.clb_channel_gap)
+            self.ax.scatter(x_io_right + self.clb_size / 2, y_io_left + self.clb_size / 2, color='blue', s=40, zorder=21)
+            total_count += 1
+
+        print(f"IO-CLB channel nodes: {io_clb_count}")
+        print(f"Total marked nodes (including IO blocks): {total_count}")
 
     # ovo izignorisite, naknadno cu samo prepraviti, nije bitno
     def draw_detailed_legend(self):
