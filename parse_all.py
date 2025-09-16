@@ -25,6 +25,7 @@ def main():
     print("7 - Najveći bounding box")
     print("8 - HPWL")
     print("9 - Top N signala sa najvećim bbox")
+    print("10 - Prvih N signala")
 
     choice = input("Unesi broj prikaza: ").strip()
 
@@ -54,6 +55,9 @@ def main():
     elif choice == "9":
         number = int(input("Unesi broj signala za prikaz: "))
         show_signal_with_largest_bbox(rrg, route_data, number)
+    elif choice == "10":
+        number = int(input("Unesi broj signala za prikaz: "))
+        show_first_n_signals(rrg, route_data, number)
     else:
         print("Nepoznata opcija.")
 
@@ -170,6 +174,19 @@ def show_signal_with_largest_bbox(rrg, route_data, number):
     save_img(visualizer)
     visualizer.show()
 
+def show_first_n_signals(rrg, route_data, number):
+    visualizer = FPGARouting()
+    visualizer.visualize_matrix(rrg)
+    visualizer.map_rrg_to_grid(rrg)
+
+    routing_paths = []
+    for net_id, net in route_data.nets.items():
+        routing_paths.append([node.id for node in net.nodes])
+
+    visualizer.visualize_first_n_routings(rrg, routing_paths, number)
+
+    save_img(visualizer)
+    visualizer.show()
 
 if __name__ == "__main__":
     main()

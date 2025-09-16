@@ -484,5 +484,21 @@ class FPGARouting(FPGAMatrix):
                 fontsize=8
             )
     
-   
-   
+    def visualize_first_n_routings(self, rrg: RRG, routing_paths, n):
+        # paleta boja (možeš proširiti po želji)
+        color_palette = [
+            'red', 'blue', 'green', 'orange', 'purple',
+            'brown', 'pink', 'cyan', 'magenta', 'yellow'
+        ]
+
+        n = min(n, len(routing_paths))
+
+        for i in range(n):
+            routing_path = routing_paths[i]
+
+            # postavi boju za trenutni signal
+            self.colors['ROUTED_PATH'] = color_palette[i % len(color_palette)]
+
+            # iscrtaj signal
+            self.visualize_routing_on_grid(rrg, routing_path, net_id=i)
+
