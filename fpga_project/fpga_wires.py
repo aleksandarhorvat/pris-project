@@ -1,4 +1,5 @@
 import matplotlib.cm as cm
+import matplotlib.patches as mpatches
 from .fpga_matrix import FPGAMatrix
 from .models import RRG
 
@@ -107,7 +108,7 @@ class FPGAWires(FPGAMatrix):
             x, y = coord
             wire_ids = segment_wires[coord]
             wire_type = rrg.nodes[wire_ids[0]].type if wire_ids else 'CHANX'
-
+            
             # IO kanali detektuj po xlow/ylow (ako imaš pristup node-u)
             io_channel = False
             node = rrg.nodes[wire_ids[0]]
@@ -121,12 +122,20 @@ class FPGAWires(FPGAMatrix):
             if wire_type == 'CHANX':
                 if io_channel:
                     # IO horizontalni kanal: pomeri tekst iznad i centriraj
+                    rect_x = x - self.clb_size / 2 + 0.25
+                    rect_y = y - self.channel_width / 2 + 0.4
+                    rect_w = self.clb_size
+                    rect_h = self.channel_width
                     text_x = x + 0.25
                     text_y = y + 0.25
                     ha = 'center'
                     va = 'bottom'
                 else:
                     # CLB horizontalni kanal: više gore i malo levo
+                    rect_x = x - self.clb_size / 2
+                    rect_y = y - self.channel_width / 2 + 0.4
+                    rect_w = self.clb_size
+                    rect_h = self.channel_width
                     text_x = x
                     text_y = y + 0.25
                     ha = 'center'
@@ -134,12 +143,20 @@ class FPGAWires(FPGAMatrix):
             elif wire_type == 'CHANY':
                 if io_channel:
                     # IO vertikalni kanal: pomeri tekst desno i centriraj
+                    rect_x = x - self.channel_width / 2 + 0.45
+                    rect_y = y - self.clb_size / 2 + 0.25
+                    rect_w = self.channel_width
+                    rect_h = self.clb_size
                     text_x = x + 0.2
                     text_y = y + 0.25
                     ha = 'left'
                     va = 'center'
                 else:
                     # CLB vertikalni kanal: desno od segmenta
+                    rect_x = x - self.channel_width / 2 + 0.45
+                    rect_y = y - self.clb_size / 2
+                    rect_w = self.channel_width
+                    rect_h = self.clb_size
                     text_x = x + 0.18
                     text_y = y
                     ha = 'left'
@@ -150,6 +167,17 @@ class FPGAWires(FPGAMatrix):
                 ha = 'center'
                 va = 'center'
 
+            usage_ratio = used / total if total else 0
+            color = cm.Reds(usage_ratio)
+            
+            rect = mpatches.Rectangle(
+                (rect_x, rect_y),
+                rect_w, rect_h,
+                linewidth=0, edgecolor=None,
+                facecolor=color, alpha=0.38, zorder=6
+            )
+            self.ax.add_patch(rect)
+            
             self.ax.text(
                 text_x, text_y,
                 f"{used}/{total}",

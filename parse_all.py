@@ -22,10 +22,11 @@ def main():
     print("4 - Wire congestion")
     print("5 - Segment wire usage")
     print("6 - Bounding box jednog signala")
-    print("7 - Najveći bounding box")
-    print("8 - HPWL")
-    print("9 - Top N signala sa najvećim bbox")
-    print("10 - Prvih N signala")
+    print("7 - Terminal bounding box jednog signala")
+    print("8 - Najveći bounding box-ovi")
+    print("9 - Najveći terminal bounding box-ovi")
+    print("10 - HPWL")
+    print("11 - Prvih N signala")
 
     choice = input("Unesi broj prikaza: ").strip()
 
@@ -49,13 +50,19 @@ def main():
         routing_path = [node.id for node in net.nodes]
         show_bounding_boxes(rrg, routing_path, net_id)
     elif choice == "7":
-        show_largest_bounding_box(rrg, route_data)
+        net_id = int(input("Unesi net_id za terminal bounding box: "))
+        net = route_data.nets[net_id]
+        routing_path = [node.id for node in net.nodes]
+        show_terminal_bounding_boxes(rrg, routing_path, net_id)
     elif choice == "8":
-        show_hpwl(rrg, route_data)
+        number = int(input("Unesi broj signala za prikaz: "))
+        show_largest_bounding_boxes(rrg, route_data, number)
     elif choice == "9":
         number = int(input("Unesi broj signala za prikaz: "))
-        show_signal_with_largest_bbox(rrg, route_data, number)
+        show_largest_terminal_bounding_boxes(rrg, route_data, number)
     elif choice == "10":
+        show_hpwl(rrg, route_data)
+    elif choice == "11":
         number = int(input("Unesi broj signala za prikaz: "))
         show_first_n_signals(rrg, route_data, number)
     else:
@@ -144,35 +151,35 @@ def show_bounding_boxes(rrg, routing_path, net_id):
     save_img(visualizer)
     visualizer.show()
 
-
-def show_largest_bounding_box(rrg, route_data):
+def show_terminal_bounding_boxes(rrg, routing_path, net_id):
     visualizer = FPGABoundingBox()
     visualizer.visualize_matrix(rrg)
     visualizer.map_rrg_to_grid(rrg)
-    visualizer.visualize_largest_bounding_box_net(rrg, route_data)
+    visualizer.visualize_terminal_bounding_box(rrg, routing_path, net_id)
     save_img(visualizer)
     visualizer.show()
 
+def show_largest_bounding_boxes(rrg, route_data, n):
+    visualizer = FPGABoundingBox()
+    visualizer.visualize_matrix(rrg)
+    visualizer.map_rrg_to_grid(rrg)
+    visualizer.visualize_top_n_bounding_box_nets(rrg, route_data, n)
+    save_img(visualizer)
+    visualizer.show()
+
+def show_largest_terminal_bounding_boxes(rrg, route_data, n):
+    visualizer = FPGABoundingBox()
+    visualizer.visualize_matrix(rrg)
+    visualizer.map_rrg_to_grid(rrg)
+    visualizer.visualize_top_n_terminal_bounding_box_nets(rrg, route_data, n)
+    save_img(visualizer)
+    visualizer.show()
 
 def show_hpwl(rrg, route_data):
     visualizer = FPGARouting()
     visualizer.map_rrg_to_grid(rrg)
     results = visualizer.hpwl_all_signals(rrg, route_data)
     visualizer.save_hpwl(results)
-
-
-def show_signal_with_largest_bbox(rrg, route_data, number):
-    visualizer = FPGARouting()
-    visualizer.visualize_matrix(rrg)
-    visualizer.map_rrg_to_grid(rrg)
-    success, result = visualizer.get_signals_with_largest_bboxes(
-        rrg, route_data, number)
-    if not success:
-        print("Greska")
-        return
-    visualizer.visualize_largest_bboxes(result)
-    save_img(visualizer)
-    visualizer.show()
 
 def show_first_n_signals(rrg, route_data, number):
     visualizer = FPGARouting()
