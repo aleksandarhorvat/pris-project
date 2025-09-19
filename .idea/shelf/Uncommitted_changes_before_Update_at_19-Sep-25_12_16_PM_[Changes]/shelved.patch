@@ -1,0 +1,280 @@
+Index: fpga_project/fpga_routing.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import matplotlib.pyplot as plt\r\nfrom bokeh.colors.named import lemonchiffon\r\nimport random\r\nfrom matplotlib import patches\r\n\r\nfrom .fpga_matrix import FPGAMatrix\r\nfrom .models import RRG\r\n\r\n\r\nclass FPGARouting(FPGAMatrix):\r\n    def __init__(self):\r\n        super().__init__()\r\n\r\n    def visualize_routing_on_grid(self, rrg: RRG, routing_path, net_id=None):\r\n        self.routing_path = routing_path\r\n        self.net_id = net_id\r\n\r\n        self.draw_routing_path_on_grid(rrg)\r\n\r\n    def draw_routing_path_on_grid(self, rrg: RRG):\r\n        if not self.routing_path:\r\n            print(\"Nemamo rutu\")\r\n            return\r\n\r\n        # pratimo edges da bi izbegli duplikate\r\n        drawn_edges = set()\r\n        x_coords = []\r\n        y_coords = []\r\n        node_ids = []\r\n        arrow_positions = []\r\n\r\n        # pratimo putanju signala, tj. lista nodova\r\n        signal_flow = {}\r\n\r\n        # pravimo rutu\r\n        for i in range(len(self.routing_path) - 1):\r\n            node_id1 = self.routing_path[i]\r\n            node_id2 = self.routing_path[i + 1]\r\n\r\n            if node_id1 not in signal_flow:\r\n                signal_flow[node_id1] = []\r\n            signal_flow[node_id1].append(node_id2)\r\n\r\n        # skupljamo sve sinkove\r\n        sink_nodes = []\r\n        for node_id in self.routing_path:\r\n            if rrg.nodes[node_id].type == \"SINK\":\r\n                if node_id in self.coord_map:\r\n                    sink_nodes.append((node_id, self.coord_map[node_id]))\r\n\r\n        for i in range(len(self.routing_path) - 1):\r\n            node_id1 = self.routing_path[i]\r\n            node_id2 = self.routing_path[i + 1]\r\n\r\n            if (rrg.nodes[node_id1].type == \"SINK\" or\r\n                    rrg.nodes[node_id2].type == \"SINK\"):\r\n                continue\r\n\r\n            if node_id1 not in self.coord_map or node_id2 not in self.coord_map:\r\n                print(f\"Upozorenje: Node {node_id1} ili {node_id2} nije na coord_map\")\r\n                continue\r\n\r\n            x1, y1 = self.coord_map[node_id1]\r\n            x2, y2 = self.coord_map[node_id2]\r\n\r\n            node1 = rrg.nodes[node_id1]\r\n            node2 = rrg.nodes[node_id2]\r\n\r\n            # ovaj deo dole se bavi onim preskakanjem kada imamo povratnu putanju\r\n            if i == 0:\r\n                x_coords.append(x1)\r\n                y_coords.append(y1)\r\n                node_ids.append(node_id1)\r\n            x_coords.append(x2)\r\n            y_coords.append(y2)\r\n            node_ids.append(node_id2)\r\n\r\n            edge_key = (node_id1, node_id2)\r\n            if edge_key in drawn_edges:\r\n                continue\r\n            drawn_edges.add(edge_key)\r\n\r\n            # racunamo vektor u kom smeru cemo nacrtati strelice\r\n            dx = x2 - x1\r\n            dy = y2 - y1\r\n            length = (dx ** 2 + dy ** 2) ** 0.5\r\n            if length > 0:\r\n                dx_norm = dx / length\r\n                dy_norm = dy / length\r\n            else:\r\n                dx_norm, dy_norm = 0, 0\r\n\r\n            # ovde nam je crtanje rute podeljeno po segmentima u zavisnosti sta se povezuje, isto vazi i za crtanje strelica\r\n            # io veze - direktna linija\r\n            if node1.type == 'IO' or node2.type == 'IO':\r\n                self.ax.plot([x1, x2], [y1, y2],\r\n                             color=self.colors['ROUTED_PATH'], linewidth=2, alpha=0.9)\r\n                # dodajemo strelice na 70% ovog segementa\r\n                arrow_x = x1 + 0.7 * dx\r\n                arrow_y = y1 + 0.7 * dy\r\n                arrow_positions.append((arrow_x, arrow_y, dx_norm, dy_norm))\r\n\r\n            # kanal-kanal veza\r\n            if node1.type in ['CHANX', 'CHANY'] and node2.type in ['CHANX', 'CHANY']:\r\n                # ista vrsta kanala - direktna linija\r\n                if node1.type == node2.type:\r\n                    self.ax.plot([x1, x2], [y1, y2],\r\n                                 color=self.colors['ROUTED_PATH'], linewidth=2, alpha=0.9)\r\n                    # dodajemo strelice na 70% ovog segementa\r\n                    arrow_x = x1 + 0.7 * dx\r\n                    arrow_y = y1 + 0.7 * dy\r\n                    arrow_positions.append((arrow_x, arrow_y, dx_norm, dy_norm))\r\n                else:\r\n                    # razlicita vrsta kanala - L-oblik\r\n                    # Pronađi tačku preseka (sredinu kanala)\r\n                    if node1.type == 'CHANX':  # horizontalni -> vertikalni\r\n                        # Koristimo x koordinatu vertikalnog kanala i y koordinatu horizontalnog kanala\r\n                        turn_x = x2\r\n                        turn_y = y1\r\n                    else:  # vertikalni -> horizontalni\r\n                        # Koristimo x koordinatu vertikalnog kanala i y koordinatu horizontalnog kanala\r\n                        turn_x = x1\r\n                        turn_y = y2\r\n\r\n                    # Crtamo L-oblik: prvi segment do tačke okreta, pa drugi segment\r\n                    self.ax.plot([x1, turn_x], [y1, turn_y],\r\n                                 color=self.colors['ROUTED_PATH'], linewidth=2, alpha=0.9)\r\n                    self.ax.plot([turn_x, x2], [turn_y, y2],\r\n                                 color=self.colors['ROUTED_PATH'], linewidth=2, alpha=0.9)\r\n\r\n                    # dodajemo strelice za oba smera crtanja\r\n                    # prvi smer - do okreta\r\n                    seg1_dx = turn_x - x1\r\n                    seg1_dy = turn_y - y1\r\n                    seg1_length = (seg1_dx ** 2 + seg1_dy ** 2) ** 0.5\r\n                    if seg1_length > 0:\r\n                        seg1_dx_norm = seg1_dx / seg1_length\r\n                        seg1_dy_norm = seg1_dy / seg1_length\r\n                    else:\r\n                        seg1_dx_norm, seg1_dy_norm = 0, 0\r\n\r\n                    arrow_x1 = x1 + 0.7 * seg1_dx\r\n                    arrow_y1 = y1 + 0.7 * seg1_dy\r\n                    arrow_positions.append((arrow_x1, arrow_y1, seg1_dx_norm, seg1_dy_norm))\r\n\r\n                    # drugi smer - od okreta\r\n                    seg2_dx = x2 - turn_x\r\n                    seg2_dy = y2 - turn_y\r\n                    seg2_length = (seg2_dx ** 2 + seg2_dy ** 2) ** 0.5\r\n                    if seg2_length > 0:\r\n                        seg2_dx_norm = seg2_dx / seg2_length\r\n                        seg2_dy_norm = seg2_dy / seg2_length\r\n                    else:\r\n                        seg2_dx_norm, seg2_dy_norm = 0, 0\r\n\r\n                    arrow_x2 = turn_x + 0.7 * seg2_dx\r\n                    arrow_y2 = turn_y + 0.7 * seg2_dy\r\n                    arrow_positions.append((arrow_x2, arrow_y2, seg2_dx_norm, seg2_dy_norm))\r\n\r\n            else:\r\n                # pin-kanal ili kanal-pin veza - direktna linija\r\n                self.ax.plot([x1, x2], [y1, y2],\r\n                             color=self.colors['ROUTED_PATH'], linewidth=2, alpha=0.9)\r\n                # dodajemo strelice na 70% ovog segementa\r\n                arrow_x = x1 + 0.7 * dx\r\n                arrow_y = y1 + 0.7 * dy\r\n                arrow_positions.append((arrow_x, arrow_y, dx_norm, dy_norm))\r\n\r\n        # sve strelice\r\n        for arrow_x, arrow_y, dx_norm, dy_norm in arrow_positions:\r\n            # crtamo samo ako imamo dobar smer\r\n            if dx_norm != 0 or dy_norm != 0:\r\n                # duzina repa strelice da ne bude predugacko\r\n                tail_length = 0.05\r\n                self.ax.arrow(arrow_x, arrow_y, dx_norm * tail_length, dy_norm * tail_length, head_width=0.09,\r\n                              head_length=0.09,\r\n                              fc=self.colors['ROUTED_PATH'],\r\n                              ec=self.colors['ROUTED_PATH'])\r\n\r\n        # labele za source\r\n        if len(node_ids) >= 2:\r\n            self.ax.text(x_coords[0], y_coords[0] - 0.3, f'{node_ids[0]}',\r\n                         ha='center', va='center', fontsize=7,\r\n                         bbox=dict(boxstyle=\"round,pad=0.2\", facecolor=\"lightblue\"))\r\n\r\n        # labele za sve sink\r\n        for node_id, (x, y) in sink_nodes:\r\n            self.ax.text(x, y - 0.3, f'{node_id}',\r\n                         ha='center', va='center', fontsize=7,\r\n                         bbox=dict(boxstyle=\"round,pad=0.2\", facecolor=\"lightgreen\"))\r\n\r\n    def visualize_routing_by_branching(self, rrg: RRG, route_data, branching_factor: int):\r\n        if not route_data.nets:\r\n            print(\"Nema netova\")\r\n            return       \r\n        # lista svih routing pathova za crtanje\r\n        all_routing_paths = []\r\n\r\n        for net_id, net in route_data.nets.items():\r\n            num_sinks = sum(1 for node in net.nodes if node.type == \"SINK\")\r\n            if num_sinks != branching_factor:\r\n                continue  # preskocimo netove koji ne zadovoljavaju faktor\r\n\r\n            routing_path = [node.id for node in net.nodes]\r\n            all_routing_paths.append((routing_path, net_id))\r\n\r\n        # pozivamo draw metodu sa svim routing pathovima\r\n        self.draw_branching_paths_on_grid(rrg, all_routing_paths)\r\n\r\n    \r\n    def draw_branching_paths_on_grid(self, rrg: RRG, all_routing_paths: list):\r\n        if not all_routing_paths:\r\n            print(\"Nema ruta za crtanje\")\r\n            return\r\n        \r\n        labeled_positions = {}\r\n        \r\n        colors = {}\r\n        for _, net_id in all_routing_paths:\r\n            colors[net_id] = (random.random(), random.random(), random.random())\r\n        \r\n            \r\n        for routing_path, net_id in all_routing_paths:\r\n            drawn_edges = set()\r\n            arrow_positions = []\r\n            x_coords, y_coords = [], []\r\n\r\n            for i in range(len(routing_path) - 1):\r\n                node_id1 = routing_path[i]\r\n                node_id2 = routing_path[i + 1]\r\n\r\n                node1 = rrg.nodes[node_id1]\r\n                node2 = rrg.nodes[node_id2]\r\n\r\n                if (rrg.nodes[node_id1].type == \"SINK\" or\r\n                    rrg.nodes[node_id2].type == \"SINK\"):\r\n                    continue\r\n\r\n                if node_id1 not in self.coord_map or node_id2 not in self.coord_map:\r\n                    print(f\"Upozorenje: Node {node_id1} ili {node_id2} nije na coord_map\")\r\n                    continue\r\n                \r\n                \r\n                x1, y1 = self.coord_map[node_id1]\r\n                x2, y2 = self.coord_map[node_id2]\r\n\r\n                if node2.type == \"SINK\":\r\n                    self.ax.plot([x1, x2], [y1, y2], color=colors[net_id], linewidth=2, alpha=0.9)\r\n                    dx, dy = x2 - x1, y2 - y1\r\n                    length = (dx**2 + dy**2)**0.5\r\n                    if length > 0:\r\n                        dx_norm, dy_norm = dx / length, dy / length\r\n                        self.ax.arrow(x1 + 0.7*dx, y1 + 0.7*dy, dx_norm*0.05, dy_norm*0.05,\r\n                                    head_width=0.09, head_length=0.09, fc=colors[net_id], ec=colors[net_id])\r\n                    # dodavanje koordinata za source/sink label\r\n                    if i == 0:\r\n                        x_coords.append(x1)\r\n                        y_coords.append(y1)\r\n                    x_coords.append(x2)\r\n                    y_coords.append(y2)\r\n                    break  # preskoci dalje, ne crtamo iz SINK-a\r\n                \r\n                dx = x2 - x1\r\n                dy = y2 - y1\r\n                length = (dx ** 2 + dy ** 2) ** 0.5\r\n                dx_norm, dy_norm = (dx / length, dy / length) if length > 0 else (0, 0)\r\n                \r\n                \r\n                if node1.type in ['CHANX', 'CHANY'] and node2.type in ['CHANX', 'CHANY'] and node1.type != node2.type:\r\n                    \r\n                    turn_x = x2 if node1.type == 'CHANX' else x1\r\n                    turn_y = y1 if node1.type == 'CHANX' else y2\r\n                    self.ax.plot([x1, turn_x], [y1, turn_y], color=colors[net_id], linewidth=2, alpha=0.9)\r\n                    self.ax.plot([turn_x, x2], [turn_y, y2], color=colors[net_id], linewidth=2, alpha=0.9)\r\n\r\n                    # strelice za L-shape\r\n                    seg1_dx, seg1_dy = turn_x - x1, turn_y - y1\r\n                    seg1_length = (seg1_dx ** 2 + seg1_dy ** 2) ** 0.5\r\n                    seg1_dx_norm = seg1_dx / seg1_length if seg1_length > 0 else 0\r\n                    seg1_dy_norm = seg1_dy / seg1_length if seg1_length > 0 else 0\r\n                    arrow_positions.append((x1 + 0.7*seg1_dx, y1 + 0.7*seg1_dy, seg1_dx_norm, seg1_dy_norm))\r\n\r\n                    seg2_dx, seg2_dy = x2 - turn_x, y2 - turn_y\r\n                    seg2_length = (seg2_dx ** 2 + seg2_dy ** 2) ** 0.5\r\n                    seg2_dx_norm = seg2_dx / seg2_length if seg2_length > 0 else 0\r\n                    seg2_dy_norm = seg2_dy / seg2_length if seg2_length > 0 else 0\r\n                    arrow_positions.append((turn_x + 0.7*seg2_dx, turn_y + 0.7*seg2_dy, seg2_dx_norm, seg2_dy_norm))\r\n                else:\r\n                    \r\n                    self.ax.plot([x1, x2], [y1, y2], color=colors[net_id], linewidth=2, alpha=0.9)\r\n                    arrow_positions.append((x1 + 0.7*dx, y1 + 0.7*dy, dx_norm, dy_norm))\r\n                \r\n        \r\n                if i == 0:\r\n                    x_coords.append(x1)\r\n                    y_coords.append(y1)\r\n                x_coords.append(x2)\r\n                y_coords.append(y2)\r\n                drawn_edges.add((node_id1, node_id2))\r\n                \r\n        \r\n            for arrow_x, arrow_y, dx_norm, dy_norm in arrow_positions:\r\n                if dx_norm != 0 or dy_norm != 0:\r\n                    tail_length = 0.05\r\n                    self.ax.arrow(arrow_x, arrow_y, dx_norm*tail_length, dy_norm*tail_length,\r\n                                head_width=0.09, head_length=0.09, fc=colors[net_id], ec=colors[net_id])\r\n\r\n            \r\n            #po jedan samo ispise\r\n            # self.ax.text(x_coords[0], y_coords[0]-0.3, f\"S-{net_id}\",\r\n            #             ha='center', va='center', fontsize=7,\r\n            #             bbox=dict(boxstyle=\"round,pad=0.2\", facecolor=\"lightblue\"))\r\n\r\n\r\n            # sink_nodes = [node_id for node_id in routing_path if rrg.nodes[node_id].type == \"SINK\"]\r\n            # for node_id in sink_nodes:\r\n            #     x, y = self.coord_map[node_id]\r\n            #     self.ax.text(x, y-0.3, f\"E-{net_id}\",\r\n            #                 ha='center', va='center', fontsize=7,\r\n            #                 bbox=dict(boxstyle=\"round,pad=0.2\", facecolor=\"lightgreen\"))\r\n            \r\n            #deo sa offsetom - nabaca sve nodes koji su tu \r\n            nodes_list = [rrg.nodes[node_id] for node_id in routing_path]\r\n            for i, node in enumerate(nodes_list):\r\n                if node.type in ['SOURCE', 'SINK']:\r\n                    x_pos = self.coord_map[node.id][0]\r\n                    y_pos = self.coord_map[node.id][1]\r\n                    position_key = (x_pos, y_pos)\r\n\r\n                    # proverimo da li je pozicija vec koriscena\r\n                    if position_key in labeled_positions:\r\n                        # ako jeste, pomerimo na dole malo da ne dodje do preklapanja\r\n                        offset = labeled_positions[position_key] * -0.25\r\n                        labeled_positions[position_key] += 1\r\n                    else:\r\n                        # ako nije samo postavimo\r\n                        offset = 0\r\n                        labeled_positions[position_key] = 1\r\n\r\n                    label_text = f\"S-{net_id}\" if node.type == 'SOURCE' else f\"E-{net_id}\"\r\n                    facecolor = \"lightblue\" if node.type == 'SOURCE' else \"lightgreen\"\r\n\r\n                    self.ax.text(x_pos, y_pos + offset - 0.3, label_text,\r\n                                 ha=\"center\", va=\"center\", fontsize=6,\r\n                                 bbox=dict(boxstyle=\"round,pad=0.1\", facecolor=facecolor))\r\n\r\n    def hpwl_all_signals(self, rrg: RRG, route):\r\n\r\n        hpwl_results = {}\r\n\r\n        for net_id, net in route.nets.items():\r\n\r\n            nodes = net.nodes\r\n            x_coords, y_coords = [], []\r\n\r\n            for node in nodes:\r\n                if node.id in self.coord_map:\r\n                    x, y = self.coord_map[node.id]\r\n                    x_coords.append(x)\r\n                    y_coords.append(y)\r\n                else:\r\n                    try:\r\n                        start_clb_x = self.io_size + self.io_clb_gap\r\n                        start_clb_y = self.io_size + self.io_clb_gap\r\n                        x, y = self.calculate_node_position(node, start_clb_x, start_clb_y)\r\n\r\n                        if x is not None and y is not None:\r\n                            x_coords.append(x)\r\n                            y_coords.append(y)\r\n                            self.coord_map[node.id] = (x, y)\r\n                    except:\r\n                        print(f\"Nije moguce dobiti koordinatu za cvor {node.id}\")\r\n                        continue\r\n\r\n            if x_coords and y_coords:\r\n                x_min, x_max = min(x_coords), max(x_coords)\r\n                y_min, y_max = min(y_coords), max(y_coords)\r\n                hpwl = (x_max - x_min) + (y_max - y_min)\r\n                hpwl_results[net_id] = hpwl\r\n            else:\r\n                hpwl_results[net_id] = 0\r\n                print(f\"Signal {net_id} nema validnih koordinata\")\r\n\r\n        return hpwl_results\r\n\r\n    def save_hpwl(self, hpwl_results, filename=\"hpwl_metrika.txt\"):\r\n        try:\r\n            with open(filename, 'w', encoding='utf-8') as f:\r\n                f.write(\"HPWL METRIKA\\n\")\r\n                f.write(\"*\" * 25 + \"\\n\")\r\n\r\n                total_hpwl = 0\r\n                for net_id, hpwl in hpwl_results.items():\r\n                    f.write(f\"Signal {net_id}: HPWL = {hpwl:.2f}\\n\")\r\n                    total_hpwl += hpwl\r\n\r\n                avg_hpwl = total_hpwl / len(hpwl_results) if hpwl_results else 0\r\n                max_hpwl = max(hpwl_results.values()) if hpwl_results else 0\r\n                min_hpwl = min(hpwl_results.values()) if hpwl_results else 0\r\n\r\n                f.write(\"\\n\" + \"*\" * 25 + \"\\n\")\r\n                f.write(f\"Ukupan HPWL: {total_hpwl:.2f}\\n\")\r\n                f.write(f\"Prosečan HPWL: {avg_hpwl:.2f}\\n\")\r\n                f.write(f\"Maksimalni HPWL: {max_hpwl:.2f}\\n\")\r\n                f.write(f\"Minimalni HPWL: {min_hpwl:.2f}\\n\")\r\n                f.write(\"*\" * 25 + \"\\n\")\r\n\r\n            print(f\"HPWL metrike su sačuvane u fajl: {filename}\")\r\n\r\n        except Exception as e:\r\n            print(f\"Greška pri snimanju HPWL metrika u fajl: {e}\")\r\n\r\n    # default neka bude 5, a moze se pozivati i vise naravno, dole imamo ogranicenje ako korisnik zeli vise signala nego sto je dostupno\r\n    def get_signals_with_largest_bboxes(self, rrg: RRG, route, top_n = 5):\r\n\r\n        signal_bboxes = []\r\n\r\n        for net_id, net in route.nets.items():\r\n            x_coords, y_coords = [], []\r\n\r\n            for node in net.nodes:\r\n                if node.id in self.coord_map:\r\n                    x, y = self.coord_map[node.id]\r\n                    x_coords.append(x)\r\n                    y_coords.append(y)\r\n                else:\r\n                    try:\r\n                        start_clb_x = self.io_size + self.io_clb_gap\r\n                        start_clb_y = self.io_size + self.io_clb_gap\r\n                        x, y = self.calculate_node_position(node, start_clb_x, start_clb_y)\r\n\r\n                        if x is not None and y is not None:\r\n                            x_coords.append(x)\r\n                            y_coords.append(y)\r\n                            self.coord_map[node.id] = (x, y)\r\n                    except:\r\n                        print(f\"Nije moguce dobiti koordinatu za cvor {node.id}\")\r\n                        continue\r\n\r\n            if x_coords and y_coords:\r\n                x_min, x_max = min(x_coords), max(x_coords)\r\n                y_min, y_max = min(y_coords), max(y_coords)\r\n                width = x_max - x_min\r\n                height = y_max - y_min\r\n                area = width * height\r\n\r\n                bbox_coords = (x_min, y_min, x_max, y_max)\r\n                signal_bboxes.append((net_id, bbox_coords, area))\r\n\r\n        signal_bboxes.sort(key=lambda x : x[2], reverse=True)\r\n\r\n        if top_n > len(signal_bboxes):\r\n            print(f\"Greska, dostupno je {len(signal_bboxes)} signala\")\r\n            return False\r\n\r\n        return True, signal_bboxes[:top_n]\r\n\r\n\r\n    def visualize_largest_bboxes(self, largest_bboxes):\r\n\r\n        if not largest_bboxes:\r\n            print(\"Greska, nema signala sa validnim bounding boxom\")\r\n            return\r\n\r\n        colors = plt.cm.tab10.colors\r\n\r\n        for i, (net_id, bbox_coords, area) in enumerate(largest_bboxes):\r\n            x_min, y_min, x_max, y_max = bbox_coords\r\n            width = x_max - x_min\r\n            height = y_max - y_min\r\n\r\n            bbox = patches.Rectangle(\r\n                (x_min, y_min), width, height,\r\n                linewidth=2, edgecolor=colors[i % len(colors)],\r\n                facecolor='none', linestyle='--', alpha=0.8\r\n            )\r\n            self.ax.add_patch(bbox)\r\n\r\n            label = f\"Net {net_id}\\nOblast: {area:.2f}\"\r\n            self.ax.text(\r\n                x_min + width/ 3, y_min - 0.5, label,\r\n                ha='center', va='top',\r\n                bbox=dict(boxstyle=\"round,pad=0.3\", facecolor=colors[i % len(colors)], alpha=0.7),\r\n                fontsize=8\r\n            )\r\n    \r\n   \r\n   \r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/fpga_project/fpga_routing.py b/fpga_project/fpga_routing.py
+--- a/fpga_project/fpga_routing.py	(revision e8c09dbb7e4ae12bcf5ba9f85525312def70cb41)
++++ b/fpga_project/fpga_routing.py	(date 1758194015207)
+@@ -410,79 +410,7 @@
+         except Exception as e:
+             print(f"Greška pri snimanju HPWL metrika u fajl: {e}")
+ 
+-    # default neka bude 5, a moze se pozivati i vise naravno, dole imamo ogranicenje ako korisnik zeli vise signala nego sto je dostupno
+-    def get_signals_with_largest_bboxes(self, rrg: RRG, route, top_n = 5):
+-
+-        signal_bboxes = []
+-
+-        for net_id, net in route.nets.items():
+-            x_coords, y_coords = [], []
+-
+-            for node in net.nodes:
+-                if node.id in self.coord_map:
+-                    x, y = self.coord_map[node.id]
+-                    x_coords.append(x)
+-                    y_coords.append(y)
+-                else:
+-                    try:
+-                        start_clb_x = self.io_size + self.io_clb_gap
+-                        start_clb_y = self.io_size + self.io_clb_gap
+-                        x, y = self.calculate_node_position(node, start_clb_x, start_clb_y)
+-
+-                        if x is not None and y is not None:
+-                            x_coords.append(x)
+-                            y_coords.append(y)
+-                            self.coord_map[node.id] = (x, y)
+-                    except:
+-                        print(f"Nije moguce dobiti koordinatu za cvor {node.id}")
+-                        continue
+-
+-            if x_coords and y_coords:
+-                x_min, x_max = min(x_coords), max(x_coords)
+-                y_min, y_max = min(y_coords), max(y_coords)
+-                width = x_max - x_min
+-                height = y_max - y_min
+-                area = width * height
+-
+-                bbox_coords = (x_min, y_min, x_max, y_max)
+-                signal_bboxes.append((net_id, bbox_coords, area))
+-
+-        signal_bboxes.sort(key=lambda x : x[2], reverse=True)
+ 
+-        if top_n > len(signal_bboxes):
+-            print(f"Greska, dostupno je {len(signal_bboxes)} signala")
+-            return False
+ 
+-        return True, signal_bboxes[:top_n]
+-
+-
+-    def visualize_largest_bboxes(self, largest_bboxes):
+-
+-        if not largest_bboxes:
+-            print("Greska, nema signala sa validnim bounding boxom")
+-            return
+-
+-        colors = plt.cm.tab10.colors
+-
+-        for i, (net_id, bbox_coords, area) in enumerate(largest_bboxes):
+-            x_min, y_min, x_max, y_max = bbox_coords
+-            width = x_max - x_min
+-            height = y_max - y_min
+-
+-            bbox = patches.Rectangle(
+-                (x_min, y_min), width, height,
+-                linewidth=2, edgecolor=colors[i % len(colors)],
+-                facecolor='none', linestyle='--', alpha=0.8
+-            )
+-            self.ax.add_patch(bbox)
+-
+-            label = f"Net {net_id}\nOblast: {area:.2f}"
+-            self.ax.text(
+-                x_min + width/ 3, y_min - 0.5, label,
+-                ha='center', va='top',
+-                bbox=dict(boxstyle="round,pad=0.3", facecolor=colors[i % len(colors)], alpha=0.7),
+-                fontsize=8
+-            )
+-    
+    
+    
+Index: parse_all.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from fpga_project.parser_rrg import RRGParser\r\nfrom fpga_project.parser_route import RouteParser\r\nfrom fpga_project.fpga_matrix import FPGAMatrix\r\nfrom fpga_project.fpga_routing import FPGARouting\r\nfrom fpga_project.fpga_wires import FPGAWires\r\nfrom fpga_project.fpga_bounding_box import FPGABoundingBox\r\n\r\n\r\ndef main():\r\n    rrg = parse_rrg()\r\n    route_number = input(\"Unesi broj rute, 0 ako je finalna: \").strip()\r\n    if route_number == \"0\":\r\n        route_data = parse_route(\"b9/b9.route\")\r\n    else:\r\n        route_data = parse_route(\r\n            \"b9/iteration_\" + route_number.zfill(3) + \".route\")\r\n\r\n    print(\"Izaberi prikaz:\")\r\n    print(\"1 - Matrix\")\r\n    print(\"2 - Routing jednog signala\")\r\n    print(\"3 - Routing by branching\")\r\n    print(\"4 - Wire congestion\")\r\n    print(\"5 - Segment wire usage\")\r\n    print(\"6 - Bounding box jednog signala\")\r\n    print(\"7 - Najveći bounding box\")\r\n    print(\"8 - HPWL\")\r\n    print(\"9 - Top N signala sa najvećim bbox\")\r\n\r\n    choice = input(\"Unesi broj prikaza: \").strip()\r\n\r\n    if choice == \"1\":\r\n        show_matrix(rrg)\r\n    elif choice == \"2\":\r\n        net_id = int(input(\"Unesi net_id za prikaz rute: \"))\r\n        net = route_data.nets[net_id]\r\n        routing_path = [node.id for node in net.nodes]\r\n        show_routing(rrg, routing_path, net_id)\r\n    elif choice == \"3\":\r\n        branching = int(input(\"Unesi faktor grananja: \"))\r\n        show_routing_by_branching(rrg, route_data, branching)\r\n    elif choice == \"4\":\r\n        show_wire_congestion(rrg, route_data, route_number)\r\n    elif choice == \"5\":\r\n        show_segment_wire_usage(rrg, route_data, route_number)\r\n    elif choice == \"6\":\r\n        net_id = int(input(\"Unesi net_id za bounding box: \"))\r\n        net = route_data.nets[net_id]\r\n        routing_path = [node.id for node in net.nodes]\r\n        show_bounding_boxes(rrg, routing_path, net_id)\r\n    elif choice == \"7\":\r\n        show_largest_bounding_box(rrg, route_data)\r\n    elif choice == \"8\":\r\n        show_hpwl(rrg, route_data)\r\n    elif choice == \"9\":\r\n        number = int(input(\"Unesi broj signala za prikaz: \"))\r\n        show_signal_with_largest_bbox(rrg, route_data, number)\r\n    else:\r\n        print(\"Nepoznata opcija.\")\r\n\r\n\r\ndef save_img(visualizer):\r\n    save_img = input(\r\n        \"Da li želite da sačuvate sliku kao PNG? (d/n): \").strip().lower()\r\n    if save_img == \"d\":\r\n        file_name = input(\"Unesite ime fajla (bez ekstenzije): \").strip()\r\n        if not file_name.endswith(\".png\"):\r\n            file_name += \".png\"\r\n        # Pronađi poslednji korišćen vizualizer\r\n        # Pretpostavljamo da se zove 'visualizer' u svakoj funkciji\r\n        try:\r\n            visualizer.save(file_name)\r\n            print(f\"Slika je sačuvana kao {file_name}\")\r\n        except Exception:\r\n            print(\"Nije moguće sačuvati sliku. Proveri da li je vizualizer dostupan.\")\r\n\r\n\r\ndef parse_route(file_path: str):\r\n    parser = RouteParser()\r\n    parser.parse(file_path)\r\n    route_data = parser.get_route()\r\n    return route_data\r\n\r\n\r\ndef parse_rrg():\r\n    rrpParser = RRGParser()\r\n    rrpParser.parse(\"b9/rrg.xml\")\r\n    rrg = rrpParser.get_rrg()\r\n    return rrg\r\n\r\n\r\ndef show_matrix(rrg):\r\n    visualizer = FPGAMatrix()\r\n    visualizer.visualize_matrix(rrg)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_routing(rrg, route_data, net_id):\r\n    visualizer = FPGARouting()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    visualizer.visualize_routing_on_grid(rrg, route_data, net_id)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_routing_by_branching(rrg, route_data, branching_factor):\r\n    visualizer = FPGARouting()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    visualizer.visualize_routing_by_branching(\r\n        rrg, route_data, branching_factor)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_wire_congestion(rrg, route_data, iteration):\r\n    visualizer = FPGAWires()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    visualizer.visualize_wire_congestion(rrg, route_data, iteration)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_segment_wire_usage(rrg, route_data, iteration):\r\n    visualizer = FPGAWires()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    visualizer.visualize_segment_wire_usage(rrg, route_data, iteration)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_bounding_boxes(rrg, routing_path, net_id):\r\n    visualizer = FPGABoundingBox()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    visualizer.visualize_signal_with_bounding_box(rrg, routing_path, net_id)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_largest_bounding_box(rrg, route_data):\r\n    visualizer = FPGABoundingBox()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    visualizer.visualize_largest_bounding_box_net(rrg, route_data)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\ndef show_hpwl(rrg, route_data):\r\n    visualizer = FPGARouting()\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    results = visualizer.hpwl_all_signals(rrg, route_data)\r\n    visualizer.save_hpwl(results)\r\n\r\n\r\ndef show_signal_with_largest_bbox(rrg, route_data, number):\r\n    visualizer = FPGARouting()\r\n    visualizer.visualize_matrix(rrg)\r\n    visualizer.map_rrg_to_grid(rrg)\r\n    success, result = visualizer.get_signals_with_largest_bboxes(\r\n        rrg, route_data, number)\r\n    if not success:\r\n        print(\"Greska\")\r\n        return\r\n    visualizer.visualize_largest_bboxes(result)\r\n    save_img(visualizer)\r\n    visualizer.show()\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    main()\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/parse_all.py b/parse_all.py
+--- a/parse_all.py	(revision e8c09dbb7e4ae12bcf5ba9f85525312def70cb41)
++++ b/parse_all.py	(date 1758196734584)
+@@ -158,7 +158,7 @@
+ 
+ 
+ def show_signal_with_largest_bbox(rrg, route_data, number):
+-    visualizer = FPGARouting()
++    visualizer = FPGABoundingBox()
+     visualizer.visualize_matrix(rrg)
+     visualizer.map_rrg_to_grid(rrg)
+     success, result = visualizer.get_signals_with_largest_bboxes(
+Index: fpga_project/fpga_bounding_box.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import math\r\nimport matplotlib.patches as patches\r\nfrom .fpga_routing import FPGARouting\r\nfrom .models import RRG\r\n\r\n\r\nclass FPGABoundingBox(FPGARouting):\r\n    def __init__(self):\r\n        super().__init__()\r\n\r\n    def calculate_bounding_box_area(self, routing_path, include_padding=True, padding=0.4):\r\n        if not hasattr(self, \"coord_map\"):\r\n            raise RuntimeError(\r\n                \"coord_map missing; call visualize_matrix(rrg) or map_rrg_to_grid(rrg) first\")\r\n\r\n        coords = [self.coord_map[n]\r\n                  for n in routing_path if n in self.coord_map]\r\n        if not coords:\r\n            return {\r\n                \"area_cells_ceil\": 0\r\n            }\r\n\r\n        xs, ys = zip(*coords)\r\n        min_x, max_x = min(xs), max(xs)\r\n        min_y, max_y = min(ys), max(ys)\r\n\r\n        # sizes in matplotlib units\r\n        width_no_pad = max_x - min_x\r\n        height_no_pad = max_y - min_y\r\n\r\n        pad = padding if include_padding else 0.0\r\n        width_mpl = width_no_pad + 2 * pad\r\n        height_mpl = height_no_pad + 2 * pad\r\n\r\n        area_mpl = width_mpl * height_mpl\r\n\r\n        # convert to CLB grid units (cell width/height)\r\n        cell_w = self.clb_size + self.clb_channel_gap\r\n        cell_h = self.clb_size + self.clb_channel_gap\r\n\r\n        # protect against zero cell size\r\n        if cell_w == 0 or cell_h == 0:\r\n            raise RuntimeError(\r\n                \"Invalid clb_size or clb_channel_gap (would divide by zero)\")\r\n\r\n        width_cells = width_mpl / cell_w\r\n        height_cells = height_mpl / cell_h\r\n\r\n        area_cells_ceil = math.ceil(width_cells) * math.ceil(height_cells)\r\n\r\n        return {\r\n            \"min_x\": min_x,\r\n            \"max_x\": max_x,\r\n            \"min_y\": min_y,\r\n            \"max_y\": max_y,\r\n            \"area_cells_ceil\": area_cells_ceil  # povrsina\r\n        }\r\n\r\n    def visualize_signal_with_bounding_box(self, rrg: RRG, routing_path, net_id=None):\r\n        # draw signal first\r\n        self.visualize_routing_on_grid(rrg, routing_path, net_id)\r\n\r\n        # compute bbox\r\n        metrics = self.calculate_bounding_box_area(\r\n            routing_path, include_padding=True, padding=0.4)\r\n        min_x = metrics[\"min_x\"]\r\n        max_x = metrics[\"max_x\"]\r\n        min_y = metrics[\"min_y\"]\r\n        max_y = metrics[\"max_y\"]\r\n\r\n        rect = patches.Rectangle(\r\n            (min_x - 0.4, min_y - 0.4),\r\n            (max_x - min_x) + 0.8,\r\n            (max_y - min_y) + 0.8,\r\n            linewidth=2,\r\n            edgecolor=\"red\",\r\n            facecolor=\"none\",\r\n            alpha=0.9,\r\n            zorder=10\r\n        )\r\n        self.ax.add_patch(rect)\r\n\r\n        label_area = f\"{metrics['area_cells_ceil']} cells\"\r\n\r\n        label = f\"Net {net_id}, {label_area}\" if net_id is not None else label_area\r\n        self.ax.text(min_x, max_y + 0.5, label, fontsize=8,\r\n                     color=\"red\", ha=\"left\", va=\"bottom\", zorder=11)\r\n\r\n        return metrics\r\n\r\n\r\n    def visualize_largest_bounding_box_net(self, rrg: RRG, route_data):\r\n        \"\"\"\r\n        Go through all nets, find the one with the largest bounding box area,\r\n        draw its routing + bounding box, and return its info.\r\n        \"\"\"\r\n        if not route_data.nets:\r\n            print(\"⚠\uFE0F No nets found in route_data.\")\r\n            return None\r\n\r\n        max_net_id = None\r\n        max_area = -1\r\n        max_metrics = None\r\n\r\n        for net_id, net in route_data.nets.items():\r\n            routing_path = [node.id for node in net.nodes]\r\n            metrics = self.calculate_bounding_box_area(routing_path)\r\n\r\n            if metrics[\"area_cells_ceil\"] > max_area:\r\n                max_area = metrics[\"area_cells_ceil\"]\r\n                max_net_id = net_id\r\n                max_metrics = metrics\r\n\r\n        if max_net_id is None:\r\n            print(\"⚠\uFE0F No valid bounding boxes found.\")\r\n            return None\r\n\r\n        print(f\"Net with largest bounding box area: {max_net_id}\")\r\n        print(f\"Bounding box area: {max_area} cells\")\r\n\r\n        # visualize the winning net\r\n        routing_path = [node.id for node in route_data.nets[max_net_id].nodes]\r\n        self.visualize_signal_with_bounding_box(rrg, routing_path, net_id=max_net_id)\r\n\r\n        return {\r\n            \"net_id\": max_net_id,\r\n            \"metrics\": max_metrics\r\n        }
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/fpga_project/fpga_bounding_box.py b/fpga_project/fpga_bounding_box.py
+--- a/fpga_project/fpga_bounding_box.py	(revision e8c09dbb7e4ae12bcf5ba9f85525312def70cb41)
++++ b/fpga_project/fpga_bounding_box.py	(date 1758196718464)
+@@ -1,5 +1,8 @@
+ import math
+ import matplotlib.patches as patches
++from matplotlib import pyplot as plt
++from sympy.physics.units import metric_ton
++
+ from .fpga_routing import FPGARouting
+ from .models import RRG
+ 
+@@ -125,4 +128,78 @@
+         return {
+             "net_id": max_net_id,
+             "metrics": max_metrics
+-        }
+\ No newline at end of file
++        }
++
++        # default neka bude 5, a moze se pozivati i vise naravno, dole imamo ogranicenje ako korisnik zeli vise signala nego sto je dostupno
++
++    def get_signals_with_largest_bboxes(self, rrg: RRG, route, top_n=5):
++
++        signal_bboxes = []
++
++        for net_id, net in route.nets.items():
++            x_coords, y_coords = [], []
++
++            for node in net.nodes:
++                if node.id in self.coord_map:
++                    x, y = self.coord_map[node.id]
++                    x_coords.append(x)
++                    y_coords.append(y)
++                else:
++                    try:
++                        start_clb_x = self.io_size + self.io_clb_gap
++                        start_clb_y = self.io_size + self.io_clb_gap
++                        x, y = self.calculate_node_position(node, start_clb_x, start_clb_y)
++
++                        if x is not None and y is not None:
++                            x_coords.append(x)
++                            y_coords.append(y)
++                            self.coord_map[node.id] = (x, y)
++                    except:
++                        print(f"Nije moguce dobiti koordinatu za cvor {node.id}")
++                        continue
++
++            if x_coords and y_coords:
++                x_min, x_max = min(x_coords), max(x_coords)
++                y_min, y_max = min(y_coords), max(y_coords)
++                width = x_max - x_min
++                height = y_max - y_min
++                area = width * height
++
++                bbox_coords = (x_min, y_min, x_max, y_max)
++                signal_bboxes.append((net_id, bbox_coords, area))
++
++        signal_bboxes.sort(key=lambda x: x[2], reverse=True)
++
++        if top_n > len(signal_bboxes):
++            print(f"Greska, dostupno je {len(signal_bboxes)} signala")
++            return False
++
++        return True, signal_bboxes[:top_n]
++
++    def visualize_largest_bboxes(self, largest_bboxes):
++
++        if not largest_bboxes:
++            print("Greska, nema signala sa validnim bounding boxom")
++            return
++
++        colors = plt.cm.tab10.colors
++
++        for i, (net_id, bbox_coords, area) in enumerate(largest_bboxes):
++            x_min, y_min, x_max, y_max = bbox_coords
++            width = x_max - x_min
++            height = y_max - y_min
++
++            bbox = patches.Rectangle(
++                (x_min, y_min), width, height,
++                linewidth=2, edgecolor=colors[i % len(colors)],
++                facecolor='none', linestyle='--', alpha=0.8
++            )
++            self.ax.add_patch(bbox)
++
++            label = f"Net {net_id}\nOblast: {area:.2f}"
++            self.ax.text(
++                x_min + width / 3, y_min - 0.5, label,
++                ha='center', va='top',
++                bbox=dict(boxstyle="round,pad=0.3", facecolor=colors[i % len(colors)], alpha=0.7),
++                fontsize=8
++            )
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"c89fa435-cae2-43e8-ae0e-3967b1bfdc1a\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/fpga_project/fpga_routing.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/fpga_project/fpga_routing.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/parse_all.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/parse_all.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"FlaskConsoleOptions\" custom-start-script=\"import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\\nApp: %s [%s]\\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))\">\r\n    <envs>\r\n      <env key=\"FLASK_APP\" value=\"app\" />\r\n    </envs>\r\n    <option name=\"myCustomStartScript\" value=\"import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\\nApp: %s [%s]\\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))\" />\r\n    <option name=\"myEnvs\">\r\n      <map>\r\n        <entry key=\"FLASK_APP\" value=\"app\" />\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 0\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"31xlmCp0TcWWboFj0cIOtTRnH9E\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Python.parse_all.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"dart.analysis.tool.window.visible\": \"false\",\r\n    \"git-widget-placeholder\": \"main\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"last_opened_file_path\": \"E:/PMF/PRIS/pris-project\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"settings.editor.selected.configurable\": \"inlay.hints\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102\" />\r\n        <option value=\"bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"c89fa435-cae2-43e8-ae0e-3967b1bfdc1a\" name=\"Changes\" comment=\"\" />\r\n      <created>1756473760262</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1756473760262</updated>\r\n      <workItem from=\"1756473761332\" duration=\"8990000\" />\r\n      <workItem from=\"1756541101601\" duration=\"7111000\" />\r\n      <workItem from=\"1756552776889\" duration=\"323000\" />\r\n      <workItem from=\"1756647320963\" duration=\"3439000\" />\r\n      <workItem from=\"1756650909369\" duration=\"1274000\" />\r\n      <workItem from=\"1757152967267\" duration=\"5222000\" />\r\n      <workItem from=\"1757167170592\" duration=\"6073000\" />\r\n      <workItem from=\"1757253854310\" duration=\"8100000\" />\r\n      <workItem from=\"1757325679020\" duration=\"16462000\" />\r\n      <workItem from=\"1757347263650\" duration=\"120000\" />\r\n      <workItem from=\"1757413537862\" duration=\"7777000\" />\r\n      <workItem from=\"1757421819078\" duration=\"992000\" />\r\n      <workItem from=\"1757517915069\" duration=\"126000\" />\r\n      <workItem from=\"1757690320916\" duration=\"6937000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"com.intellij.coverage.CoverageDataManagerImpl\">\r\n    <SUITE FILE_PATH=\"coverage/pris_project$parse_all.coverage\" NAME=\"parse_all Coverage Results\" MODIFIED=\"1756491053108\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision e8c09dbb7e4ae12bcf5ba9f85525312def70cb41)
++++ b/.idea/workspace.xml	(date 1758196595023)
+@@ -5,6 +5,8 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="c89fa435-cae2-43e8-ae0e-3967b1bfdc1a" name="Changes" comment="">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/fpga_project/fpga_bounding_box.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_bounding_box.py" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/fpga_project/fpga_routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/fpga_project/fpga_routing.py" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/parse_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/parse_all.py" afterDir="false" />
+     </list>
+@@ -42,23 +44,23 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Python.parse_all.executor": "Run",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "dart.analysis.tool.window.visible": "false",
+-    "git-widget-placeholder": "main",
+-    "ignore.virus.scanning.warn.message": "true",
+-    "last_opened_file_path": "E:/PMF/PRIS/pris-project",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "settings.editor.selected.configurable": "inlay.hints",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Python.parse_all.executor&quot;: &quot;Run&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
++    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;E:/PMF/PRIS/pris-project&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+@@ -88,7 +90,9 @@
+       <workItem from="1757413537862" duration="7777000" />
+       <workItem from="1757421819078" duration="992000" />
+       <workItem from="1757517915069" duration="126000" />
+-      <workItem from="1757690320916" duration="6937000" />
++      <workItem from="1757690320916" duration="7028000" />
++      <workItem from="1757756908712" duration="261000" />
++      <workItem from="1758192813258" duration="3747000" />
+     </task>
+     <servers />
+   </component>

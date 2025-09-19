@@ -4,6 +4,7 @@ from fpga_project.fpga_matrix import FPGAMatrix
 from fpga_project.fpga_routing import FPGARouting
 from fpga_project.fpga_wires import FPGAWires
 from fpga_project.fpga_bounding_box import FPGABoundingBox
+from fpga_project.fpga_analysis import FPGARoutingAnalysis
 
 
 def main():
@@ -27,6 +28,7 @@ def main():
     print("9 - Najveći terminal bounding box-ovi")
     print("10 - HPWL")
     print("11 - Prvih N signala")
+    print("12 - Analiza odstupanja ruta od HPWL")
 
     choice = input("Unesi broj prikaza: ").strip()
 
@@ -65,6 +67,8 @@ def main():
     elif choice == "11":
         number = int(input("Unesi broj signala za prikaz: "))
         show_first_n_signals(rrg, route_data, number)
+    elif choice == "12":
+        show_deviation_analysis(rrg,route_data)
     else:
         print("Nepoznata opcija.")
 
@@ -176,7 +180,7 @@ def show_largest_terminal_bounding_boxes(rrg, route_data, n):
     visualizer.show()
 
 def show_hpwl(rrg, route_data):
-    visualizer = FPGARouting()
+    visualizer = FPGARoutingAnalysis()
     visualizer.map_rrg_to_grid(rrg)
     results = visualizer.hpwl_all_signals(rrg, route_data)
     visualizer.save_hpwl(results)
@@ -194,6 +198,39 @@ def show_first_n_signals(rrg, route_data, number):
 
     save_img(visualizer)
     visualizer.show()
+
+
+def show_deviation_analysis(rrg, route_data):
+    print("\nANALIZA ODSTUPANJA RUTA OD HPWL METRIKE")
+    print("=" * 50)
+
+    # Kreiraj analizator
+    analyzer = FPGARoutingAnalysis()
+    # OVO MORA DA BUDE OVDE ZBOG MAPIRANJA INACE NEMAMO coord_map
+    analyzer.map_rrg_to_grid(rrg)
+
+    n = int(input("Unesite broj top signala za analizu (n): "))
+
+    print("\nOpcije analize:")
+    print("1 - Prikaz top N signala sa najvećim odstupanjem")
+    print("2 - Snimi detaljnu analizu u fajl")
+
+    analysis_choice = input("Izaberite opciju (1 ili 2): ").strip()
+
+    if analysis_choice == "1":
+        analyzer.print_deviation_analysis(rrg, route_data, n)
+
+    elif analysis_choice == "2":
+        filename = input("Unesite ime fajla za čuvanje analize: ").strip()
+        if not filename:
+            filename = "hpwl_odstupanje_analiza.txt"
+
+        # Snimi analizu u fajl
+        analyzer.save_deviation_analysis(rrg, route_data, filename, n)
+
+    else:
+        print("Nepoznata opcija analize.")
+
 
 if __name__ == "__main__":
     main()

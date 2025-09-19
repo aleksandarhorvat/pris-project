@@ -8,7 +8,6 @@ class FPGABoundingBox(FPGARouting):
     def __init__(self):
         super().__init__()
 
-    
     def calculate_terminal_bounding_box_area(self, routing_path, rrg, include_padding=True, padding=0.4):
         if not hasattr(self, "coord_map"):
             raise RuntimeError(
@@ -83,10 +82,10 @@ class FPGABoundingBox(FPGARouting):
         label_area = f"{metrics['area_cells_ceil']} cells"
         label = f"Net {net_id} terminals, {label_area}" if net_id is not None else label_area
         self.ax.text(min_x, max_y + 0.5, label, fontsize=8,
-                    color=color, ha="left", va="bottom", zorder=11)
+                     color=color, ha="left", va="bottom", zorder=11)
 
         return metrics
-    
+
     def visualize_top_n_terminal_bounding_box_nets(self, rrg: RRG, route_data, n=1):
         """
         Prikaži n najvećih terminal bounding boxova (samo SOURCE i SINK čvorovi).
@@ -108,13 +107,13 @@ class FPGABoundingBox(FPGARouting):
         results = []
         for i, (net_id, metrics) in enumerate(net_metrics[:n]):
             color = colors[i % len(colors)]
-            print(f"{i+1}. Net {net_id} - Terminal bounding box area: {metrics['area_cells_ceil']} cells")
+            print(f"{i + 1}. Net {net_id} - Terminal bounding box area: {metrics['area_cells_ceil']} cells")
             routing_path = [node.id for node in route_data.nets[net_id].nodes]
             self.visualize_terminal_bounding_box(rrg, routing_path, net_id=net_id, color=color)
             results.append({"net_id": net_id, "metrics": metrics})
 
         return results
-    
+
     def calculate_bounding_box_area(self, routing_path, include_padding=True, padding=0.4):
         if not hasattr(self, "coord_map"):
             raise RuntimeError(
@@ -194,7 +193,6 @@ class FPGABoundingBox(FPGARouting):
 
         return metrics
 
-
     def visualize_top_n_bounding_box_nets(self, rrg: RRG, route_data, n=1):
         """
         Prikaži n najvećih bounding boxova (po celoj ruti).
@@ -217,7 +215,7 @@ class FPGABoundingBox(FPGARouting):
         results = []
         for i, (net_id, metrics) in enumerate(net_metrics[:n]):
             color = colors[i % len(colors)]
-            print(f"{i+1}. Net {net_id} - Bounding box area: {metrics['area_cells_ceil']} cells")
+            print(f"{i + 1}. Net {net_id} - Bounding box area: {metrics['area_cells_ceil']} cells")
             routing_path = [node.id for node in route_data.nets[net_id].nodes]
             self.visualize_signal_with_bounding_box(rrg, routing_path, net_id=net_id, color=color)
             results.append({"net_id": net_id, "metrics": metrics})

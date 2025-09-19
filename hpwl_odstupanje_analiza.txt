@@ -1,0 +1,183 @@
+ANALIZA ODSTUPANJA RUTA OD HPWL METRIKE
+================================================================================
+
+Ukupan broj signala: 73
+Prosečno apsolutno odstupanje: -1.05
+Prosečno relativno odstupanje: -25.79%
+--------------------------------------------------------------------------------
+
+
+TOP 3 SIGNALA PO APSOLUTNOM ODSTUPANJU:
+
+--------------------------------------------------------------------------------
+
+ 1. Net    0: HPWL= 13.37, Žice= 20, Aps.dev=  6.63, Rel.dev= 49.64%
+ 2. Net   28: HPWL= 12.50, Žice= 17, Aps.dev=  4.50, Rel.dev= 36.00%
+ 3. Net    4: HPWL= 14.00, Žice= 18, Aps.dev=  4.00, Rel.dev= 28.57%
+
+
+TOP 3 SIGNALA PO RELATIVNOM ODSTUPANJU:
+
+--------------------------------------------------------------------------------
+
+ 1. Net   42: HPWL=  5.25, Žice=  8, Aps.dev=  2.75, Rel.dev= 52.38%
+ 2. Net    0: HPWL= 13.37, Žice= 20, Aps.dev=  6.63, Rel.dev= 49.64%
+ 3. Net    5: HPWL=  9.14, Žice= 13, Aps.dev=  3.86, Rel.dev= 42.15%
+
+================================================================================
+
+DETALJAN PREGLED SVIH SIGNALA:
+================================================================================
+
+Signali sortirani po apsolutnom odstupanju:
+--------------------------------------------------------------------------------
+Net 0: HPWL=13.37, Žice=20, Aps.dev=6.63, Rel.dev=49.64%
+Net 28: HPWL=12.50, Žice=17, Aps.dev=4.50, Rel.dev=36.00%
+Net 4: HPWL=14.00, Žice=18, Aps.dev=4.00, Rel.dev=28.57%
+Net 5: HPWL=9.14, Žice=13, Aps.dev=3.86, Rel.dev=42.15%
+Net 42: HPWL=5.25, Žice=8, Aps.dev=2.75, Rel.dev=52.38%
+Net 29: HPWL=5.89, Žice=8, Aps.dev=2.11, Rel.dev=35.71%
+Net 41: HPWL=6.62, Žice=8, Aps.dev=1.38, Rel.dev=20.94%
+Net 27: HPWL=7.13, Žice=8, Aps.dev=0.87, Rel.dev=12.20%
+Net 1: HPWL=7.64, Žice=8, Aps.dev=0.36, Rel.dev=4.64%
+Net 21: HPWL=6.25, Žice=6, Aps.dev=-0.25, Rel.dev=-3.92%
+Net 7: HPWL=6.38, Žice=6, Aps.dev=-0.38, Rel.dev=-5.88%
+Net 43: HPWL=4.38, Žice=4, Aps.dev=-0.38, Rel.dev=-8.57%
+Net 65: HPWL=2.40, Žice=2, Aps.dev=-0.40, Rel.dev=-16.49%
+Net 24: HPWL=2.51, Žice=2, Aps.dev=-0.51, Rel.dev=-20.48%
+Net 58: HPWL=2.51, Žice=2, Aps.dev=-0.51, Rel.dev=-20.48%
+Net 69: HPWL=2.52, Žice=2, Aps.dev=-0.52, Rel.dev=-20.48%
+Net 70: HPWL=2.52, Žice=2, Aps.dev=-0.52, Rel.dev=-20.48%
+Net 3: HPWL=7.52, Žice=7, Aps.dev=-0.52, Rel.dev=-6.85%
+Net 67: HPWL=2.63, Žice=2, Aps.dev=-0.63, Rel.dev=-24.10%
+Net 39: HPWL=3.75, Žice=3, Aps.dev=-0.75, Rel.dev=-20.00%
+Net 10: HPWL=9.75, Žice=9, Aps.dev=-0.75, Rel.dev=-7.74%
+Net 11: HPWL=4.75, Žice=4, Aps.dev=-0.75, Rel.dev=-15.88%
+Net 19: HPWL=5.77, Žice=5, Aps.dev=-0.77, Rel.dev=-13.27%
+Net 68: HPWL=2.88, Žice=2, Aps.dev=-0.88, Rel.dev=-30.43%
+Net 12: HPWL=4.99, Žice=4, Aps.dev=-0.99, Rel.dev=-19.92%
+Net 15: HPWL=2.99, Žice=2, Aps.dev=-0.99, Rel.dev=-33.22%
+Net 22: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 25: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 38: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 51: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 52: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 53: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 60: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 62: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 64: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 66: HPWL=3.12, Žice=2, Aps.dev=-1.12, Rel.dev=-35.79%
+Net 55: HPWL=4.14, Žice=3, Aps.dev=-1.14, Rel.dev=-27.62%
+Net 63: HPWL=4.14, Žice=3, Aps.dev=-1.14, Rel.dev=-27.62%
+Net 57: HPWL=3.23, Žice=2, Aps.dev=-1.23, Rel.dev=-38.18%
+Net 30: HPWL=8.24, Žice=7, Aps.dev=-1.24, Rel.dev=-15.10%
+Net 37: HPWL=4.26, Žice=3, Aps.dev=-1.26, Rel.dev=-29.66%
+Net 13: HPWL=3.50, Žice=2, Aps.dev=-1.50, Rel.dev=-42.86%
+Net 23: HPWL=5.50, Žice=4, Aps.dev=-1.50, Rel.dev=-27.27%
+Net 14: HPWL=4.50, Žice=3, Aps.dev=-1.50, Rel.dev=-33.41%
+Net 59: HPWL=4.74, Žice=3, Aps.dev=-1.74, Rel.dev=-36.64%
+Net 17: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 18: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 26: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 40: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 50: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 61: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 31: HPWL=4.86, Žice=3, Aps.dev=-1.86, Rel.dev=-38.34%
+Net 32: HPWL=4.87, Žice=3, Aps.dev=-1.87, Rel.dev=-38.34%
+Net 2: HPWL=4.98, Žice=3, Aps.dev=-1.98, Rel.dev=-39.82%
+Net 34: HPWL=4.98, Žice=3, Aps.dev=-1.98, Rel.dev=-39.82%
+Net 49: HPWL=6.01, Žice=4, Aps.dev=-2.01, Rel.dev=-33.50%
+Net 54: HPWL=5.25, Žice=3, Aps.dev=-2.25, Rel.dev=-42.86%
+Net 56: HPWL=5.25, Žice=3, Aps.dev=-2.25, Rel.dev=-42.86%
+Net 44: HPWL=6.25, Žice=4, Aps.dev=-2.25, Rel.dev=-36.05%
+Net 71: HPWL=6.38, Žice=4, Aps.dev=-2.38, Rel.dev=-37.25%
+Net 47: HPWL=6.49, Žice=4, Aps.dev=-2.49, Rel.dev=-38.41%
+Net 6: HPWL=6.62, Žice=4, Aps.dev=-2.62, Rel.dev=-39.53%
+Net 36: HPWL=6.62, Žice=4, Aps.dev=-2.62, Rel.dev=-39.53%
+Net 16: HPWL=7.76, Žice=5, Aps.dev=-2.76, Rel.dev=-35.61%
+Net 45: HPWL=8.88, Žice=6, Aps.dev=-2.88, Rel.dev=-32.43%
+Net 35: HPWL=7.88, Žice=5, Aps.dev=-2.88, Rel.dev=-36.59%
+Net 9: HPWL=8.00, Žice=5, Aps.dev=-3.00, Rel.dev=-37.54%
+Net 46: HPWL=9.14, Žice=6, Aps.dev=-3.14, Rel.dev=-34.39%
+Net 48: HPWL=8.23, Žice=5, Aps.dev=-3.23, Rel.dev=-39.28%
+Net 8: HPWL=10.50, Žice=7, Aps.dev=-3.50, Rel.dev=-33.33%
+Net 72: HPWL=9.74, Žice=6, Aps.dev=-3.74, Rel.dev=-38.43%
+Net 33: HPWL=9.75, Žice=6, Aps.dev=-3.75, Rel.dev=-38.43%
+Net 20: HPWL=9.99, Žice=6, Aps.dev=-3.99, Rel.dev=-39.91%
+
+
+Signali sortirani po relativnom odstupanju:
+--------------------------------------------------------------------------------
+Net 42: HPWL=5.25, Žice=8, Aps.dev=2.75, Rel.dev=52.38%
+Net 0: HPWL=13.37, Žice=20, Aps.dev=6.63, Rel.dev=49.64%
+Net 5: HPWL=9.14, Žice=13, Aps.dev=3.86, Rel.dev=42.15%
+Net 28: HPWL=12.50, Žice=17, Aps.dev=4.50, Rel.dev=36.00%
+Net 29: HPWL=5.89, Žice=8, Aps.dev=2.11, Rel.dev=35.71%
+Net 4: HPWL=14.00, Žice=18, Aps.dev=4.00, Rel.dev=28.57%
+Net 41: HPWL=6.62, Žice=8, Aps.dev=1.38, Rel.dev=20.94%
+Net 27: HPWL=7.13, Žice=8, Aps.dev=0.87, Rel.dev=12.20%
+Net 1: HPWL=7.64, Žice=8, Aps.dev=0.36, Rel.dev=4.64%
+Net 21: HPWL=6.25, Žice=6, Aps.dev=-0.25, Rel.dev=-3.92%
+Net 7: HPWL=6.38, Žice=6, Aps.dev=-0.38, Rel.dev=-5.88%
+Net 3: HPWL=7.52, Žice=7, Aps.dev=-0.52, Rel.dev=-6.85%
+Net 10: HPWL=9.75, Žice=9, Aps.dev=-0.75, Rel.dev=-7.74%
+Net 43: HPWL=4.38, Žice=4, Aps.dev=-0.38, Rel.dev=-8.57%
+Net 19: HPWL=5.77, Žice=5, Aps.dev=-0.77, Rel.dev=-13.27%
+Net 30: HPWL=8.24, Žice=7, Aps.dev=-1.24, Rel.dev=-15.10%
+Net 11: HPWL=4.75, Žice=4, Aps.dev=-0.75, Rel.dev=-15.88%
+Net 65: HPWL=2.40, Žice=2, Aps.dev=-0.40, Rel.dev=-16.49%
+Net 12: HPWL=4.99, Žice=4, Aps.dev=-0.99, Rel.dev=-19.92%
+Net 39: HPWL=3.75, Žice=3, Aps.dev=-0.75, Rel.dev=-20.00%
+Net 24: HPWL=2.51, Žice=2, Aps.dev=-0.51, Rel.dev=-20.48%
+Net 58: HPWL=2.51, Žice=2, Aps.dev=-0.51, Rel.dev=-20.48%
+Net 69: HPWL=2.52, Žice=2, Aps.dev=-0.52, Rel.dev=-20.48%
+Net 70: HPWL=2.52, Žice=2, Aps.dev=-0.52, Rel.dev=-20.48%
+Net 67: HPWL=2.63, Žice=2, Aps.dev=-0.63, Rel.dev=-24.10%
+Net 23: HPWL=5.50, Žice=4, Aps.dev=-1.50, Rel.dev=-27.27%
+Net 55: HPWL=4.14, Žice=3, Aps.dev=-1.14, Rel.dev=-27.62%
+Net 63: HPWL=4.14, Žice=3, Aps.dev=-1.14, Rel.dev=-27.62%
+Net 37: HPWL=4.26, Žice=3, Aps.dev=-1.26, Rel.dev=-29.66%
+Net 68: HPWL=2.88, Žice=2, Aps.dev=-0.88, Rel.dev=-30.43%
+Net 45: HPWL=8.88, Žice=6, Aps.dev=-2.88, Rel.dev=-32.43%
+Net 15: HPWL=2.99, Žice=2, Aps.dev=-0.99, Rel.dev=-33.22%
+Net 8: HPWL=10.50, Žice=7, Aps.dev=-3.50, Rel.dev=-33.33%
+Net 14: HPWL=4.50, Žice=3, Aps.dev=-1.50, Rel.dev=-33.41%
+Net 49: HPWL=6.01, Žice=4, Aps.dev=-2.01, Rel.dev=-33.50%
+Net 46: HPWL=9.14, Žice=6, Aps.dev=-3.14, Rel.dev=-34.39%
+Net 16: HPWL=7.76, Žice=5, Aps.dev=-2.76, Rel.dev=-35.61%
+Net 66: HPWL=3.12, Žice=2, Aps.dev=-1.12, Rel.dev=-35.79%
+Net 44: HPWL=6.25, Žice=4, Aps.dev=-2.25, Rel.dev=-36.05%
+Net 35: HPWL=7.88, Žice=5, Aps.dev=-2.88, Rel.dev=-36.59%
+Net 59: HPWL=4.74, Žice=3, Aps.dev=-1.74, Rel.dev=-36.64%
+Net 71: HPWL=6.38, Žice=4, Aps.dev=-2.38, Rel.dev=-37.25%
+Net 9: HPWL=8.00, Žice=5, Aps.dev=-3.00, Rel.dev=-37.54%
+Net 57: HPWL=3.23, Žice=2, Aps.dev=-1.23, Rel.dev=-38.18%
+Net 31: HPWL=4.86, Žice=3, Aps.dev=-1.86, Rel.dev=-38.34%
+Net 32: HPWL=4.87, Žice=3, Aps.dev=-1.87, Rel.dev=-38.34%
+Net 47: HPWL=6.49, Žice=4, Aps.dev=-2.49, Rel.dev=-38.41%
+Net 72: HPWL=9.74, Žice=6, Aps.dev=-3.74, Rel.dev=-38.43%
+Net 33: HPWL=9.75, Žice=6, Aps.dev=-3.75, Rel.dev=-38.43%
+Net 48: HPWL=8.23, Žice=5, Aps.dev=-3.23, Rel.dev=-39.28%
+Net 6: HPWL=6.62, Žice=4, Aps.dev=-2.62, Rel.dev=-39.53%
+Net 36: HPWL=6.62, Žice=4, Aps.dev=-2.62, Rel.dev=-39.53%
+Net 2: HPWL=4.98, Žice=3, Aps.dev=-1.98, Rel.dev=-39.82%
+Net 34: HPWL=4.98, Žice=3, Aps.dev=-1.98, Rel.dev=-39.82%
+Net 20: HPWL=9.99, Žice=6, Aps.dev=-3.99, Rel.dev=-39.91%
+Net 13: HPWL=3.50, Žice=2, Aps.dev=-1.50, Rel.dev=-42.86%
+Net 54: HPWL=5.25, Žice=3, Aps.dev=-2.25, Rel.dev=-42.86%
+Net 56: HPWL=5.25, Žice=3, Aps.dev=-2.25, Rel.dev=-42.86%
+Net 17: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 18: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 26: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 40: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 50: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 61: HPWL=3.75, Žice=2, Aps.dev=-1.75, Rel.dev=-46.67%
+Net 22: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 25: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 38: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 51: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 52: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 53: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 60: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 62: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
+Net 64: HPWL=2.00, Žice=1, Aps.dev=-1.00, Rel.dev=-50.00%
