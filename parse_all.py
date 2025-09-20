@@ -29,7 +29,8 @@ def main():
     print("10 - HPWL")
     print("11 - Prvih N signala")
     print("12 - Analiza odstupanja ruta od HPWL")
-
+    print("13 - Vizualiacija broja preklapanja bounding box-ova na segmentima")
+    
     choice = input("Unesi broj prikaza: ").strip()
 
     if choice == "1":
@@ -69,6 +70,8 @@ def main():
         show_first_n_signals(rrg, route_data, number)
     elif choice == "12":
         show_deviation_analysis(rrg,route_data)
+    elif choice == "13":
+        show_segment_terminal_bounding_boxes(rrg, route_data)
     else:
         print("Nepoznata opcija.")
 
@@ -199,7 +202,6 @@ def show_first_n_signals(rrg, route_data, number):
     save_img(visualizer)
     visualizer.show()
 
-
 def show_deviation_analysis(rrg, route_data):
     print("\nANALIZA ODSTUPANJA RUTA OD HPWL METRIKE")
     print("=" * 50)
@@ -231,6 +233,14 @@ def show_deviation_analysis(rrg, route_data):
     else:
         print("Nepoznata opcija analize.")
 
+
+def show_segment_terminal_bounding_boxes(rrg, routing_path):
+    visualizer = FPGABoundingBox()
+    visualizer.visualize_matrix(rrg)
+    visualizer.map_rrg_to_grid(rrg)
+    visualizer.visualize_segment_terminal_bbox_overlap(rrg, routing_path)
+    save_img(visualizer)
+    visualizer.show()
 
 if __name__ == "__main__":
     main()
