@@ -28,7 +28,6 @@ class RouteParser:
 
                 # Node linija
                 if line.startswith("Node") and current_net is not None:
-                    # primer: Node: 547 SOURCE (4,0,0)  Pad: 7 ...
                     match = re.match(
                         r"Node:\s*(\d+)\s+(\w+)\s+\((\d+),(\d+),\d+\)\s+.*?(\d+)",
                         line

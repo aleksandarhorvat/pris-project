@@ -32,7 +32,6 @@ class RRGParser:
 
     #dobije id pin-a i vraca sa koje je strane "TOP", "TOP_RIGHT" itd.
     def get_pin_side(self, node_id: int) -> str:
-        """Vrati vrednost atributa 'side' za dati IPIN/OPIN čvor iz XML-a."""
         tree = ET.parse(self.file)
         root = tree.getroot()
 
@@ -53,22 +52,22 @@ class RRGParser:
     #proverava sa kojim pinovima je povezana i proverava na kojoj strani su ti pinovi
     #dolazi do problema gde su svi pinovi sa kojima je povezana imaju duplu stranu i onda vraca None
     def get_wire_side(self, wire_id: int) -> str:
-        # proveri da li čvor postoji i da li je žica
+        # proveri da li cvor postoji i da li je zica
         wire_node = self.rrg.nodes.get(wire_id)
         if not wire_node or wire_node.type not in ("CHANX", "CHANY"):
             return None
 
-        # gledamo sve veze gde se pojavljuje ova žica
+        # gledamo sve veze gde se pojavljuje ova zica
         for edge in self.rrg.edges:
-            # ako je žica izvor
+            # ako je zica izvor
             if edge.src == wire_id and edge.sink in self.rrg.nodes:
                 sink_node = self.rrg.nodes[edge.sink]
                 if sink_node.type in ("IPIN", "OPIN"):
                     side = self.get_pin_side(sink_node.id)
-                    if side and "_" not in side:  # samo jednoznačan side
+                    if side and "_" not in side:  # samo jednoznacan side
                         return side
 
-            # ako je žica odredište
+            # ako je zica odredište
             if edge.sink == wire_id and edge.src in self.rrg.nodes:
                 src_node = self.rrg.nodes[edge.src]
                 if src_node.type in ("IPIN", "OPIN"):

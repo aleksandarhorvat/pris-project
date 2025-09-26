@@ -187,13 +187,11 @@ class FPGAMatrix:
 
             # fallback — eksplicitna mapiranja koja repliciraju draw_* logiku
             if node.type not in ['CHANX', 'CHANY']:
-                # CLB/IPIN/OPIN/SOURCE/SINK: koristi centar CLB polja
                 # (RRG xlow/ylow su 1-based za CLB polja — zato -1)
                 visual_x = start_clb_x + (node.xlow - 1) * cell_w + self.clb_size / 2
                 visual_y = start_clb_y + (node.ylow - 1) * cell_h + self.clb_size / 2
 
             elif node.type == 'CHANX':
-                # IO<->CLB horizontalni kanali (ylow == 0 ili ylow == num_rows)
                 if node.ylow == 0 or node.ylow == self.num_rows:
                     coord = self.calculate_io_clb_channel_position(node, start_clb_x, start_clb_y)
                     if coord is not None:
@@ -201,15 +199,12 @@ class FPGAMatrix:
                     continue
 
                 # horizontalni kanal između redova CLB
-                # Centar kanala je na sredini CLB širine (x) i na odgovarajućoj y poziciji kanala
                 x_base = start_clb_x + (node.xlow - 1) * cell_w
                 y_channel = start_clb_y + (node.ylow - 1) * cell_h + self.clb_size + channel_y_inner_offset
-                # Stavimo CHANX tačku u centar horizontalnog segmenta (sredina CLB širine)
                 visual_x = x_base + self.clb_size / 2
                 visual_y = y_channel + node.ptc * self.channel_spacing
 
             elif node.type == 'CHANY':
-                # IO<->CLB vertikalni kanali (xlow == 0 ili xlow == num_cols)
                 if node.xlow == 0 or node.xlow == self.num_cols:
                     coord = self.calculate_io_clb_channel_position(node, start_clb_x, start_clb_y)
                     if coord is not None:
@@ -217,7 +212,6 @@ class FPGAMatrix:
                     continue
 
                 # vertikalni kanal između kolona CLB
-                # Centar kanala je na sredini CLB visine (y) i na odgovarajućoj x poziciji kanala
                 x_channel = start_clb_x + (node.xlow - 1) * cell_w + self.clb_size + channel_x_inner_offset
                 y_base = start_clb_y + (node.ylow - 1) * cell_h
                 visual_x = x_channel + node.ptc * self.channel_spacing
@@ -230,7 +224,6 @@ class FPGAMatrix:
 
     def calculate_node_position(self, node, start_clb_x, start_clb_y):
         if node.type in ['SOURCE', 'SINK', 'OPIN', 'IPIN']:
-            # offset +1 po koordinatama
             if 1 <= node.xlow <= self.num_cols and 1 <= node.ylow <= self.num_rows:
                 visual_x = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap)
                 visual_y = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
@@ -242,7 +235,6 @@ class FPGAMatrix:
                 return visual_x, visual_y
 
         elif node.type in ['CHANX', 'CHANY']:
-            # odvojeno ovde se resava offset
             return self.calculate_channel_position(node, start_clb_x, start_clb_y)
 
         return None, None
@@ -256,7 +248,6 @@ class FPGAMatrix:
         # horizontalni kanali
         if node.type == 'CHANX':
             if 1 <= node.ylow < self.num_rows:
-                # osnovna y pozicija
                 y_pos = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap) + self.clb_size
                 y_pos += (self.clb_channel_gap / 2) - (self.channel_width / 2)
 
@@ -269,11 +260,9 @@ class FPGAMatrix:
         # vertikalni kanali
         elif node.type == 'CHANY':
             if 1 <= node.xlow < self.num_cols:
-                # osnovna x pozicija
                 x_pos = start_clb_x + (node.xlow - 1) * (self.clb_size + self.clb_channel_gap) + self.clb_size
                 x_pos += (self.clb_channel_gap / 2) - (self.channel_width / 2)
 
-                # osnovna y pozicija
                 y_pos = start_clb_y + (node.ylow - 1) * (self.clb_size + self.clb_channel_gap)
 
                 track_offset = node.ptc * self.channel_spacing
@@ -321,61 +310,6 @@ class FPGAMatrix:
 
         return None, None
 
-    # samo debug da vidim jel sve lepo, mozemo kasnije obrisati
-    def debug_coordinate_mapping(self, rrg: RRG):
-
-        io_clb_count = 0
-        total_count = 0
-
-        for node_id, node in rrg.nodes.items():
-            visual_x, visual_y = self.calculate_node_position(
-                node, self.io_size + self.io_clb_gap, self.io_size + self.io_clb_gap
-            )
-
-            # samo proveravamo da li su kanali izmedju io i clb blokova
-            if visual_x is not None and visual_y is not None:
-                is_io_clb_channel = False
-                if node.type in ['CHANX', 'CHANY']:
-                    if (node.ylow == 0 or node.ylow == self.num_rows or
-                            node.xlow == 0 or node.xlow == self.num_cols):
-                        is_io_clb_channel = True
-                        io_clb_count += 1
-
-                self.ax.scatter(visual_x, visual_y, color='red', s=20, zorder=20)
-                total_count += 1
-        
-        # Now, mark IO blocks from grid logic (blue squares)
-        start_clb_x = self.io_size + self.io_clb_gap
-        start_clb_y = self.io_size + self.io_clb_gap
-        num_rows = getattr(self, 'num_rows', 6)
-        num_cols = getattr(self, 'num_cols', 6)
-
-        # Bottom and top IO blocks
-        for col in range(num_cols):
-            x_io = start_clb_x + col * (self.clb_size + self.clb_channel_gap)
-            y_io = 0
-            self.ax.scatter(x_io + self.clb_size / 2, y_io + self.clb_size / 2, color='blue', s=40, zorder=21)
-            total_count += 1
-
-            y_io_top = start_clb_y + num_rows * (self.clb_size + self.clb_channel_gap)
-            self.ax.scatter(x_io + self.clb_size / 2, y_io_top + self.clb_size / 2, color='blue', s=40, zorder=21)
-            total_count += 1
-
-        # Left and right IO blocks
-        for row in range(num_rows):
-            y_io_left = start_clb_y + row * (self.clb_size + self.clb_channel_gap)
-            x_io_left = 0
-            self.ax.scatter(x_io_left + self.clb_size / 2, y_io_left + self.clb_size / 2, color='blue', s=40, zorder=21)
-            total_count += 1
-
-            x_io_right = start_clb_x + num_cols * (self.clb_size + self.clb_channel_gap)
-            self.ax.scatter(x_io_right + self.clb_size / 2, y_io_left + self.clb_size / 2, color='blue', s=40, zorder=21)
-            total_count += 1
-
-        print(f"IO-CLB channel nodes: {io_clb_count}")
-        print(f"Total marked nodes (including IO blocks): {total_count}")
-
-    # ovo izignorisite, naknadno cu samo prepraviti, nije bitno
     def draw_detailed_legend(self):
         legend_elements = []
 

@@ -5,22 +5,19 @@ from .models import RRG
 
 
 class FPGAWires(FPGAMatrix):
-    """
-    Vizualizuje zagušenje po pojedinačnoj žici (tracku) u FPGA (CHANX/CHANY).
-    """
 
     def __init__(self):
         super().__init__()
 
     def visualize_wire_congestion(self, rrg, route, iteration):
-        # izdvojimo sve žice (CHANX/CHANY čvorove)
+        # izdvojimo sve zice (CHANX/CHANY cvorove)
         wires = {node.id: node for node in rrg.nodes.values() if node.type in [
             'CHANX', 'CHANY']}
 
-        # brojanje zagušenja po žicama
+        # brojanje zagusenja po zicama
         wire_load = {wire_id: 0 for wire_id in wires.keys()}
         wire_signals = {wire_id: set()
-                        for wire_id in wires.keys()}  # set za signale po žici
+                        for wire_id in wires.keys()}  # set za signale po zici
 
         for net_id, net in route.nets.items():
             # svaki wire u ruti signala evidentiramo samo jednom
@@ -33,7 +30,7 @@ class FPGAWires(FPGAMatrix):
 
         max_load = max(wire_load.values()) if wire_load else 1
 
-        # crtanje zagušenja na matrici
+        # crtanje zagusenja na matrici
         for wire_id, load in wire_load.items():
             x, y = self.coord_map.get(wire_id, (None, None))
             if x is None or y is None:
@@ -50,7 +47,7 @@ class FPGAWires(FPGAMatrix):
 
             node_type = rrg.nodes[wire_id].type
 
-            # podesavanje offseta za tip žice
+            # podesavanje offseta za tip zice
             offset = 0.101
 
             if node_type == 'CHANX':
@@ -74,11 +71,11 @@ class FPGAWires(FPGAMatrix):
             self.ax.set_title(
                 "Zagušenje po žicama - Iteracija broj " + str(iteration))
 
-        # vraćamo i mapu signala po žici ako bude potrebno
+        # vracamo i mapu signala po žici ako bude potrebno
         return wire_signals
 
     def visualize_segment_wire_usage(self, rrg, route, iteration):
-        # 1. Dobavi wire_load iz visualize_wire_congestion logike
+        # Dobavi wire_load iz visualize_wire_congestion logike
         wires = [node for node in rrg.nodes.values() if node.type in ['CHANX', 'CHANY']]
         wire_load = {wire.id: 0 for wire in wires}
         for net_id, net in route.nets.items():
@@ -86,7 +83,7 @@ class FPGAWires(FPGAMatrix):
             for wire_id in wire_ids:
                 wire_load[wire_id] += 1
 
-        # 2. Grupisi žice po koordinatama (segmentima)
+        # Grupisi zice po koordinatama (segmentima)
         segment_wires = {}
         for wire in wires:
             coord = self.get_segment_coord(wire)
@@ -96,20 +93,20 @@ class FPGAWires(FPGAMatrix):
                 segment_wires[coord] = []
             segment_wires[coord].append(wire.id)
 
-        # 3. Za svaki segment prebroji žice sa wire_load > 0
+        # Za svaki segment prebroji zice sa wire_load > 0
         segment_usage = {}
         for coord, wire_ids in segment_wires.items():
             used_count = sum(1 for wid in wire_ids if wire_load[wid] > 0)
             total_count = len(wire_ids)
             segment_usage[coord] = (used_count, total_count)
 
-        # 4. Vizualizuj na gridu
+        # Vizualizuj na gridu
         for coord, (used, total) in segment_usage.items():
             x, y = coord
             wire_ids = segment_wires[coord]
             wire_type = rrg.nodes[wire_ids[0]].type if wire_ids else 'CHANX'
             
-            # IO kanali detektuj po xlow/ylow (ako imaš pristup node-u)
+            # IO kanali detektuj po xlow/ylow (ako imas pristup node-u)
             io_channel = False
             node = rrg.nodes[wire_ids[0]]
             num_rows = getattr(self, 'num_rows', 6)
@@ -185,7 +182,6 @@ class FPGAWires(FPGAMatrix):
                 fontsize=14, color='black', fontweight='bold'
             )
 
-        # Naslov
         if iteration == 0:
             self.ax.set_title("Broj zauzetih žica po segmentu - Finalna iteracija")
         else:

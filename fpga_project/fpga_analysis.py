@@ -91,13 +91,13 @@ class FPGARoutingAnalysis(FPGABoundingBox):
 
     def calculate_deviation_metrics(self, rrg: RRG, route_data):
 
-        # Izračunaj HPWL za sve signale
+        # Izracunaj HPWL za sve signale
         hpwl_results = self.hpwl_all_signals(rrg, route_data)
 
-        # Izračunaj stvarnu dužinu rute za sve signale
+        # Izracunaj stvarnu duzinu rute za sve signale
         real_wire_usage = self.calculate_real_wire_usage(rrg, route_data)
 
-        # Izračunaj odstupanje za svaki signal
+        # Izracunaj odstupanje za svaki signal
         deviation_metrics = {}
 
         for net_id in hpwl_results.keys():

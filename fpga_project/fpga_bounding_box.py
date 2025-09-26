@@ -89,10 +89,10 @@ class FPGABoundingBox(FPGARouting):
 
     def visualize_top_n_terminal_bounding_box_nets(self, rrg: RRG, route_data, n=1):
         """
-        Prikaži n najvećih terminal bounding boxova (samo SOURCE i SINK čvorovi).
+        Prikazi n najvecih terminal bounding boxova (samo SOURCE i SINK cvorovi).
         """
         if not route_data.nets:
-            print("⚠️ No nets found in route_data.")
+            print("Signali nisu pronađeni u route_data.")
             return None
 
         colors = ["blue", "orange", "green", "purple", "brown", "magenta", "cyan", "olive", "black", "red"]
@@ -108,7 +108,7 @@ class FPGABoundingBox(FPGARouting):
         results = []
         for i, (net_id, metrics) in enumerate(net_metrics[:n]):
             color = colors[i % len(colors)]
-            print(f"{i + 1}. Net {net_id} - Terminal bounding box area: {metrics['area_cells_ceil']} cells")
+            print(f"{i + 1}. Net {net_id} - Terminal bounding box povrsina: {metrics['area_cells_ceil']} cells")
             routing_path = [node.id for node in route_data.nets[net_id].nodes]
             self.visualize_terminal_bounding_box(rrg, routing_path, net_id=net_id, color=color)
             results.append({"net_id": net_id, "metrics": metrics})
@@ -131,7 +131,6 @@ class FPGABoundingBox(FPGARouting):
         min_x, max_x = min(xs), max(xs)
         min_y, max_y = min(ys), max(ys)
 
-        # sizes in matplotlib units
         width_no_pad = max_x - min_x
         height_no_pad = max_y - min_y
 
@@ -141,11 +140,9 @@ class FPGABoundingBox(FPGARouting):
 
         area_mpl = width_mpl * height_mpl
 
-        # convert to CLB grid units (cell width/height)
         cell_w = self.clb_size + self.clb_channel_gap
         cell_h = self.clb_size + self.clb_channel_gap
 
-        # protect against zero cell size
         if cell_w == 0 or cell_h == 0:
             raise RuntimeError(
                 "Invalid clb_size or clb_channel_gap (would divide by zero)")
@@ -164,10 +161,10 @@ class FPGABoundingBox(FPGARouting):
         }
 
     def visualize_signal_with_bounding_box(self, rrg: RRG, routing_path, net_id=None, color="red"):
-        # draw signal first
+        # nacrtaj signal kao i do sada
         self.visualize_routing_on_grid(rrg, routing_path, net_id)
 
-        # compute bbox
+        # izračunaj bounding box oko cele rute
         metrics = self.calculate_bounding_box_area(
             routing_path, include_padding=True, padding=0.4)
         min_x = metrics["min_x"]
@@ -195,11 +192,8 @@ class FPGABoundingBox(FPGARouting):
         return metrics
 
     def visualize_top_n_bounding_box_nets(self, rrg: RRG, route_data, n=1):
-        """
-        Prikaži n najvećih bounding boxova (po celoj ruti).
-        """
         if not route_data.nets:
-            print("⚠️ No nets found in route_data.")
+            print("Signali nisu pronađeni u route_data.")
             return None
 
         colors = ["red", "blue", "green", "orange", "purple", "brown", "magenta", "cyan", "olive", "black"]
@@ -210,13 +204,12 @@ class FPGABoundingBox(FPGARouting):
             metrics = self.calculate_bounding_box_area(routing_path)
             net_metrics.append((net_id, metrics))
 
-        # Sort by area (descending) and take the top n
         net_metrics.sort(key=lambda x: x[1]["area_cells_ceil"], reverse=True)
 
         results = []
         for i, (net_id, metrics) in enumerate(net_metrics[:n]):
             color = colors[i % len(colors)]
-            print(f"{i + 1}. Net {net_id} - Bounding box area: {metrics['area_cells_ceil']} cells")
+            print(f"{i + 1}. Net {net_id} - Bounding box povrsina: {metrics['area_cells_ceil']} elementi")
             routing_path = [node.id for node in route_data.nets[net_id].nodes]
             self.visualize_signal_with_bounding_box(rrg, routing_path, net_id=net_id, color=color)
             results.append({"net_id": net_id, "metrics": metrics})
