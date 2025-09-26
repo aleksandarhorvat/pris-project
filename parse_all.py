@@ -83,7 +83,7 @@ def save_img(visualizer):
         file_name = input("Unesite ime fajla (bez ekstenzije): ").strip()
         if not file_name.endswith(".png"):
             file_name += ".png"
-        # Pronađi poslednji korišćen vizualizer
+        # Pronadji poslednji koriscen vizualizer
         # Pretpostavljamo da se zove 'visualizer' u svakoj funkciji
         try:
             visualizer.save(file_name)
@@ -208,7 +208,6 @@ def show_deviation_analysis(rrg, route_data):
 
     # Kreiraj analizator
     analyzer = FPGARoutingAnalysis()
-    # OVO MORA DA BUDE OVDE ZBOG MAPIRANJA INACE NEMAMO coord_map
     analyzer.map_rrg_to_grid(rrg)
 
     n = int(input("Unesite broj top signala za analizu (n): "))
@@ -227,7 +226,6 @@ def show_deviation_analysis(rrg, route_data):
         if not filename:
             filename = "hpwl_odstupanje_analiza.txt"
 
-        # Snimi analizu u fajl
         analyzer.save_deviation_analysis(rrg, route_data, filename, n)
 
     else:
